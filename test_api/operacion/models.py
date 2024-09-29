@@ -11,6 +11,7 @@ ESTADOS = [
     ('finalizada', 'Finalizada'),
 ]
 
+
 class Operacion(models.Model):
     id_tipo_operacion = models.CharField(choices=[("terceros", "terceros"), ("interna", "interna")], default="interna", max_length=20)
     status = models.CharField(choices=ESTADOS, default='Agendada', max_length=20)
@@ -22,6 +23,11 @@ class Operacion(models.Model):
     cantidad = models.IntegerField()
     comentario = models.TextField(blank=True)
     precio = models.DecimalField(max_length=6, decimal_places=2, max_digits=6)
+    img = models.ImageField()
 
     class Meta:
         ordering = ["status"]
+
+
+class Flujo(models.Model):
+    pass

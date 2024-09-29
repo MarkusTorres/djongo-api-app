@@ -6,4 +6,4 @@ class ProveedorSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Proveedor
-        fields = ['nombre']
+        fields = ['id', 'nombre']

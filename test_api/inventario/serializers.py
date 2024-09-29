@@ -6,4 +6,4 @@ class InventarioSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Inventario
-        fields = ['concepto', 'cantidad', 'comentario']
+        fields = ['id', 'concepto', 'cantidad', 'comentario']

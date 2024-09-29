@@ -6,6 +6,10 @@ class OperacionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Operacion
-        fields = ['url', 'id', 'id_tipo_operacion', 'status',
+        fields = ['id', 'url', 'id_tipo_operacion', 'status',
                   'direccion_inicio', 'direccion_final', 'tarifa',
                   'fecha_inicio', 'cantidad', 'comentario']
+
+
+class FlujoSerializer(serializers.HyperlinkedModelSerializer):
+    pass

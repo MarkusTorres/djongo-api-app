@@ -16,13 +16,28 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from snippets import views
+from rest_framework.routers import DefaultRouter
+# from snippets import views
+from operacion import views as views_operacion
+from empleado import views as views_empleado
+from clientes import views as views_clientes
+from repartidores import views as views_repartidores
+from proveedores import views as views_proveedores
+from inventario import views as views_inventario
+from municipio import views as views_municipios
+
+router = DefaultRouter()
+router.register(r'operacion', views_operacion.OperacionViewSet, basename='operacion')
+router.register(r'flujo_operacion', views_operacion.FlujoViewSet, basename='flujo')
+router.register(r'empleados', views_empleado.EmpleadoViewSet, basename='empleado')
+router.register(r'clientes', views_clientes.ClienteViewSet, basename='cliente')
+# router.register(r'repartidores', views_repartidores.RepartidorViewSet, basename='repartidor')
+router.register(r'proveedores', views_proveedores.ProveedorViewSet, basename='proveedor')
+router.register(r'inventario', views_inventario.InventarioViewSet, basename='inventario')
+router.register(r'municipios', views_municipios.MunicipioViewSet, basename='municipio')
 
 urlpatterns = [
-    path("", include("snippets.urls")),
-    # path("", include("operacion.urls")),
-    path("admin/", admin.site.urls),
-    # path('users/', views.UserList.as_view()),
-    # path('users/<int:pk>/', views.UserDetail.as_view()),
+    path('', include(router.urls)),
+    path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
 ]

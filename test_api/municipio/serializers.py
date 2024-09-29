@@ -6,4 +6,4 @@ class MunicipioSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Municipio
-        fields = ['nombre', 'precio']
+        fields = ['id', 'nombre', 'precio']
