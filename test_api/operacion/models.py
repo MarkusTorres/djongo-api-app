@@ -23,7 +23,7 @@ class Operacion(models.Model):
     cantidad = models.IntegerField()
     comentario = models.TextField(blank=True)
     precio = models.DecimalField(max_length=6, decimal_places=2, max_digits=6)
-    img = models.ImageField()
+    # img = models.ImageField()
 
     class Meta:
         ordering = ["status"]
