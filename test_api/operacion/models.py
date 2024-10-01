@@ -1,4 +1,5 @@
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 ESTADOS = [
     ('agendada', 'Agendada'),
@@ -23,6 +24,8 @@ class Operacion(models.Model):
     cantidad = models.IntegerField()
     comentario = models.TextField(blank=True)
     precio = models.DecimalField(max_length=6, decimal_places=2, max_digits=6)
+    nombre_referencia = models.CharField(max_length=90, blank=True)
+    numero_referencia = PhoneNumberField(blank=True)
     # img = models.ImageField()
 
     class Meta:

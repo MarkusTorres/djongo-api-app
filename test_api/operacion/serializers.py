@@ -8,7 +8,7 @@ class OperacionSerializer(serializers.HyperlinkedModelSerializer):
         model = Operacion
         fields = ['id', 'url', 'id_tipo_operacion', 'status',
                   'direccion_inicio', 'direccion_final', 'tarifa',
-                  'fecha_inicio', 'cantidad', 'comentario']
+                  'fecha_inicio', 'cantidad', 'nombre_referencia', 'numero_referencia', 'comentario']
 
 
 class FlujoSerializer(serializers.HyperlinkedModelSerializer):

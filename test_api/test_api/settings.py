@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # framework stuff
     "rest_framework",
+    "phonenumber_field",
+    # API stuff
     "snippets",
     "operacion",
     "empleado",
