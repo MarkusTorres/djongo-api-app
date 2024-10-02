@@ -15,6 +15,7 @@ ESTADOS = [
 
 class Operacion(models.Model):
     id_tipo_operacion = models.CharField(choices=[("terceros", "terceros"), ("interna", "interna")], default="interna", max_length=20)
+    codigo = models.CharField(max_length=50, blank=False)
     status = models.CharField(choices=ESTADOS, default='Agendada', max_length=20)
     direccion_inicio = models.TextField()
     direccion_final = models.TextField()
@@ -26,6 +27,8 @@ class Operacion(models.Model):
     precio = models.DecimalField(max_length=6, decimal_places=2, max_digits=6)
     nombre_referencia = models.CharField(max_length=90, blank=True)
     numero_referencia = PhoneNumberField(blank=True)
+    repartidor = models.PositiveIntegerField(blank=True)
+    historial = models.JSONField()
     # img = models.ImageField()
 
     class Meta:

@@ -38,6 +38,28 @@ class OperacionViewSet(viewsets.ModelViewSet):
     queryset = Operacion.objects.all()
     serializer_class = OperacionSerializer
 
+    @action(detail=True, methods=['get'])
+    def codigo(self, request, pk=None):
+        queryset = Operacion.objects.get(codigo=pk)
+
+        serializer_context = {
+            'request': request,
+        }
+        serializer = OperacionSerializer(queryset, context=serializer_context)
+
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get', 'post', 'patch'])
+    def repartidor(self, request, pk=None):
+        queryset = Operacion.objects.get(repartidor=pk)
+
+        serializer_context = {
+            'request': request,
+        }
+        serializer = OperacionSerializer(queryset, context=serializer_context)
+
+        return Response(serializer.data)
+
 
 class FlujoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Flujo.objects.all()
