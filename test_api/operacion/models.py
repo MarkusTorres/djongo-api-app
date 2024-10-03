@@ -30,6 +30,10 @@ class Operacion(models.Model):
     repartidor = models.PositiveIntegerField(blank=True)
     historial = models.JSONField()
     # img = models.ImageField()
+    peso = models.PositiveIntegerField(blank=False)
+    largo = models.PositiveIntegerField(blank=False)
+    ancho = models.PositiveIntegerField(blank=False)
+    alto = models.PositiveIntegerField(blank=False)
 
     class Meta:
         ordering = ["status"]
