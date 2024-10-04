@@ -6,4 +6,4 @@ class EmpleadoSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Empleado
-        fields = ['id', 'id_tipo', 'nombre', 'sueldo', 'fecha_inicio', 'fecha_final']
+        fields = '__all__'
