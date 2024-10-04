@@ -75,6 +75,8 @@ class OperacionViewSet(viewsets.ModelViewSet):
                 query_result.largo = request.data['largo']
                 query_result.ancho = request.data['ancho']
                 query_result.alto = request.data['alto']
+                query_result.devoluciones = request.data['devoluciones']
+                query_result.entregas = request.data['entregas']
 
                 query_result.save()
 
@@ -85,6 +87,14 @@ class OperacionViewSet(viewsets.ModelViewSet):
         except ObjectDoesNotExist:
             return Response(data=f'id {pk} not found', status=status.HTTP_400_BAD_REQUEST)
 
+    # for future implementation, custom creation of object depending of data
+    # def create(self, request, *args, **kwargs):
+    #     tipo_operacion = request.data['id_tipo_operacion']
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['get', 'post', 'patch'])
     def repartidor(self, request, pk=None):
