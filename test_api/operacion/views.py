@@ -96,14 +96,14 @@ class OperacionViewSet(viewsets.ModelViewSet):
     #
     #     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['get', 'post', 'patch'])
+    @action(detail=True, methods=['get'])
     def repartidor(self, request, pk=None):
-        queryset = Operacion.objects.get(repartidor=pk)
+        queryset = Operacion.objects.filter(repartidor__exact=pk)
 
         serializer_context = {
             'request': request,
         }
-        serializer = OperacionSerializer(queryset, context=serializer_context)
+        serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
 
         return Response(serializer.data)
 
