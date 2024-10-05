@@ -29,7 +29,7 @@ class Operacion(models.Model):
     fecha_final = models.DateField(default=datetime.date.today)
     cantidad = models.PositiveIntegerField(blank=False, default=1)
     comentario = models.TextField(blank=True)
-    precio = models.DecimalField(max_length=6, decimal_places=2, max_digits=6, default=1)
+    precio = models.DecimalField(max_length=20, decimal_places=2, max_digits=12, default=1)
     nombre_referencia = models.CharField(max_length=90, blank=True)
     numero_referencia = PhoneNumberField(blank=True)
     repartidor = models.PositiveIntegerField(blank=True)
