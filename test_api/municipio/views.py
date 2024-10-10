@@ -10,6 +10,20 @@ class MunicipioViewSet(viewsets.ModelViewSet):
     queryset = Municipio.objects.all()
     serializer_class = MunicipioSerializer
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        id = Municipio.objects.count() + 1
+        new_item = Municipio.objects.create(
+            id=Municipio.objects.count()+1,
+            nombre=data['nombre'],
+            precio=data['precio']
+        )
+        new_item.id = id
+        # breakpoint()
+        new_item.save()
+        serializer = MunicipioSerializer(new_item)
+        return Response(serializer.data)
+
 @api_view
 def api_root(request, format=None):
     return Response({

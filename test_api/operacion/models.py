@@ -32,16 +32,16 @@ class Operacion(models.Model):
     precio = models.DecimalField(max_length=20, decimal_places=2, max_digits=12, default=1)
     nombre_referencia = models.CharField(max_length=90, blank=True)
     numero_referencia = PhoneNumberField(blank=True)
-    repartidor = models.PositiveIntegerField(blank=True)
+    repartidor = models.PositiveIntegerField(blank=True, default=0)
     historial = models.JSONField(blank=True)
     # img = models.ImageField()
-    peso = models.PositiveIntegerField(blank=True)
-    largo = models.PositiveIntegerField(blank=True)
-    ancho = models.PositiveIntegerField(blank=True)
-    alto = models.PositiveIntegerField(blank=True)
+    peso = models.PositiveIntegerField(blank=True, default=0)
+    largo = models.PositiveIntegerField(blank=True, default=0)
+    ancho = models.PositiveIntegerField(blank=True, default=0)
+    alto = models.PositiveIntegerField(blank=True, default=0)
 
-    devoluciones = models.PositiveIntegerField(blank=True)
-    entregas = models.PositiveIntegerField(blank=True)
+    devoluciones = models.PositiveIntegerField(blank=True, default=0)
+    entregas = models.PositiveIntegerField(blank=True, default=0)
 
     class Meta:
         ordering = ["status"]

@@ -107,6 +107,38 @@ class OperacionViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        id = Operacion.objects.count() + 1
+        new_item = Operacion.objects.create(
+            id=Operacion.objects.count() + 1,
+            id_tipo_operacion=data['id_tipo_operacion'],
+            codigo=data['codigo'],
+            status=data['status'],
+            direccion_inicio=data['direccion_inicio'],
+            direccion_final=data['direccion_final'],
+            tarifa=data['tarifa'],
+            # fecha_inicio=data['fecha_inicio'],
+            fecha_final=data['fecha_final'],
+            cantidad=data['cantidad'],
+            comentario=data['comentario'],
+            precio=data['precio'],
+            nombre_referencia=data['nombre_referencia'],
+            numero_referencia=data['numero_referencia'],
+            repartidor=data['repartidor'],
+            historial=data['historial'],
+            peso=data['peso'],
+            largo=data['largo'],
+            ancho=data['ancho'],
+            alto=data['alto'],
+            devoluciones=data['devoluciones'],
+            entregas=data['entregas']
+        )
+        new_item.id = id
+        new_item.save()
+        serializer = OperacionSerializer(new_item)
+        return Response(serializer.data)
+
 
 class FlujoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Flujo.objects.all()
