@@ -103,9 +103,7 @@ DATABASES = {
                 'host': 'mongodb+srv://db-mongodb-nyc3-65641-cf7fd127.mongo.ondigitalocean.com',
                 'port': 27017,
                 'username': 'user-api',
-                'password': '230y47ZlWO5j9Rv6',
-                'authSource': 'db-name',
-                'authMechanism': 'SCRAM-SHA-1'
+                'password': '230y47ZlWO5j9Rv6'
             },
         'LOGGING': {
             'version': 1,
