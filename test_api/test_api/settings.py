@@ -98,6 +98,24 @@ DATABASES = {
         "ENGINE": "djongo",
         # "NAME": BASE_DIR / "db.sqlite3",
         "NAME": "paqe_api_db",
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+                'host': 'mongodb+srv://db-mongodb-nyc3-65641-cf7fd127.mongo.ondigitalocean.com',
+                'port': 27017,
+                'username': 'user-api',
+                'password': '230y47ZlWO5j9Rv6',
+                'authSource': 'db-name',
+                'authMechanism': 'SCRAM-SHA-1'
+            },
+        'LOGGING': {
+            'version': 1,
+            'loggers': {
+                'djongo': {
+                    'level': 'DEBUG',
+                    'propagate': False,
+                }
+            },
+        },
     }
 }
 
