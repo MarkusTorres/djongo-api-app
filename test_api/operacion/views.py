@@ -15,15 +15,15 @@ from rest_framework.pagination import PageNumberPagination
 import json
 
 
-CREADA = 'Creada'
-AGENDADA = 'Agendada'
-EN_RUTA = 'En ruta'
-CANCELADA = 'Cancelada'
-EFECTIVA = 'Efectiva'
-TRANSFERENCIA = 'Transferencia'
-REAGENDADA = 'Reagendada'
-ENTREGADA = 'Entregada'
-FINALIZADA = 'Finalizada'
+CREADA = 'creada'
+AGENDADA = 'agendada'
+EN_RUTA = 'en ruta'
+CANCELADA = 'efectiva'
+EFECTIVA = 'transferencia'
+TRANSFERENCIA = 'reagendada'
+REAGENDADA = 'cancelada'
+ENTREGADA = 'entregada'
+FINALIZADA = 'finalizada'
 
 flujo_operacion = {
     CREADA: [AGENDADA],
@@ -86,15 +86,6 @@ class OperacionViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except ObjectDoesNotExist:
             return Response(data=f'id {pk} not found', status=status.HTTP_400_BAD_REQUEST)
-
-    # for future implementation, custom creation of object depending of data
-    # def create(self, request, *args, **kwargs):
-    #     tipo_operacion = request.data['id_tipo_operacion']
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['get'])
     def repartidor(self, request, pk=None):
