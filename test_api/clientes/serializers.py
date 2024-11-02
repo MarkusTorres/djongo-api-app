@@ -7,4 +7,5 @@ class ClienteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Cliente
         # nota is not here on purpose
-        fields = '__all__'
+        fields = ['id', 'id_tipo', 'nombre', 'calle', 'num_int', 'num_ext', 'colonia', 'cp',
+                  'telefono', 'municipio', 'estado', 'entre_calles', 'desc_fachada', 'referencia', 'tarifa', 'nota']
