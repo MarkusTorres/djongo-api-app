@@ -1,0 +1,23 @@
+{
+    "id_tipo_operacion": "interna",
+    "codigo": "10",
+    "status": "creada",
+    "direccion_inicio": "dir-inicio",
+    "direccion_final": "dir-final",
+    "tarifa": "10.00",
+    "fecha_inicio": "2024-11-17",
+    "fecha_final": "2024-11-20",
+    "cantidad": 1,
+    "comentario": "testing",
+    "precio": "1000.00",
+    "nombre_referencia": "Eduardo",
+    "numero_referencia": "3310980522",
+    "repartidor": 1,
+    "historial": "null",
+    "peso": 10,
+    "largo": 10,
+    "ancho": 10,
+    "alto": 10,
+    "devoluciones": 0,
+    "entregas": 0
+}

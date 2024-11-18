@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from operacion.models import Operacion
 from operacion.models import Flujo
 from operacion.serializers import OperacionSerializer
@@ -131,6 +132,62 @@ class OperacionViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+def insert_operacion(data, model):
+    id = model.objects.count() + 1
+    new_item = model.objects.create(
+        id=model.objects.count() + 1,
+        id_tipo_operacion=data['id_tipo_operacion'],
+        codigo=data['codigo'],
+        status=data['status'],
+        direccion_inicio=data['direccion_inicio'],
+        direccion_final=data['direccion_final'],
+        tarifa=data['tarifa'],
+        # fecha_inicio=data['fecha_inicio'],
+        fecha_final=data['fecha_final'],
+        cantidad=data['cantidad'],
+        comentario=data['comentario'],
+        precio=data['precio'],
+        nombre_referencia=data['nombre_referencia'],
+        numero_referencia=data['numero_referencia'],
+        repartidor=data['repartidor'],
+        historial=data['historial'],
+        peso=data['peso'],
+        largo=data['largo'],
+        ancho=data['ancho'],
+        alto=data['alto'],
+        devoluciones=data['devoluciones'],
+        entregas=data['entregas']
+    )
+    new_item.id = id
+    new_item.save()
+    serializer_class = OperacionSerializer(new_item)
+    return serializer_class.data
+
+
+class OperacionBulkViewSet(viewsets.ModelViewSet):
+    queryset = Operacion.objects.all()
+    serializer_class = OperacionSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        results = [insert_operacion(single_operacion, Operacion) for single_operacion in data]
+        serializer = self.get_serializer(data=request.data, many=True)
+        headers = self.get_success_headers(results)
+        return Response(results, status=status.HTTP_201_CREATED, headers=headers)
+
+    def list(self, request, *args, **kwargs):
+        raise Http404
+
+    def destroy(self, request, *args, **kwargs):
+        raise Http404
+
+    def update(self, request, *args, **kwargs):
+        raise Http404
+
+    def retrieve(self, request, *args, **kwargs):
+        raise Http404
+
+
 class FlujoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Flujo.objects.all()
     serializer_class = FlujoSerializer
@@ -143,5 +200,6 @@ class FlujoViewSet(viewsets.ReadOnlyModelViewSet):
 def api_root(request, format=None):
     return Response({
         'operaciones': reverse('operacion-list', request=request, format=format),
+        'operaciones-bulk': reverse('operacion-bulk-list', request=request, format=format),
         'flujo_operaciones': reverse('flujo_operaciones', request=request, format=format),
     })

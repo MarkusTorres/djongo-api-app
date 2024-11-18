@@ -28,6 +28,7 @@ from municipio import views as views_municipios
 
 router = DefaultRouter()
 router.register(r'operacion', views_operacion.OperacionViewSet, basename='operacion')
+router.register(r'operacion-bulk', views_operacion.OperacionBulkViewSet, basename='operacion-bulk')
 router.register(r'flujo_operacion', views_operacion.FlujoViewSet, basename='flujo')
 router.register(r'empleados', views_empleado.EmpleadoViewSet, basename='empleado')
 router.register(r'clientes', views_clientes.ClienteViewSet, basename='cliente')

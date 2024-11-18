@@ -1,0 +1,1 @@
+http -j POST http://127.0.0.1:8000/operacion-bulk/ < ./bulk-add.json -v
