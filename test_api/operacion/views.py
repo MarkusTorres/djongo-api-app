@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 from django.http import Http404
 from operacion.models import Operacion
 from operacion.models import Flujo
@@ -124,8 +125,12 @@ class OperacionViewSet(viewsets.ModelViewSet):
             ancho=data['ancho'],
             alto=data['alto'],
             devoluciones=data['devoluciones'],
-            entregas=data['entregas']
+            entregas=data['entregas'],
+            inventario_relacion=data['inventario_relacion']
         )
+        # breakpoint()
+        if new_item.id_tipo_operacion == 'producto' and new_item.inventario_relacion == '':
+            raise ValidationError(detail="Operacion tipo producto debe especificar inventario", code=500)
         new_item.id = id
         new_item.save()
         serializer = OperacionSerializer(new_item)

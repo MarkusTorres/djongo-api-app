@@ -1,5 +1,5 @@
 {
-    "id_tipo_operacion": "interna",
+    "id_tipo_operacion": "producto",
     "codigo": "10",
     "status": "creada",
     "direccion_inicio": "dir-inicio",
@@ -19,5 +19,6 @@
     "ancho": 10,
     "alto": 10,
     "devoluciones": 0,
-    "entregas": 0
+    "entregas": 0,
+    "inventario_relacion": ""
 }

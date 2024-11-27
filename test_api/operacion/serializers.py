@@ -10,7 +10,7 @@ class OperacionSerializer(serializers.HyperlinkedModelSerializer):
                   'direccion_final', 'tarifa', 'fecha_inicio', 'fecha_final',
                   'cantidad', 'comentario', 'precio', 'nombre_referencia',
                   'numero_referencia', 'repartidor', 'historial', 'peso',
-                  'largo', 'ancho', 'alto', 'devoluciones', 'entregas']
+                  'largo', 'ancho', 'alto', 'devoluciones', 'entregas', 'inventario_relacion']
 
 
 class FlujoSerializer(serializers.HyperlinkedModelSerializer):
