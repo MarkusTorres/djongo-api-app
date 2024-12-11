@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "proveedores",
     "inventario",
     "municipio",
+    "tokens"
 ]
 
 MIDDLEWARE = [
