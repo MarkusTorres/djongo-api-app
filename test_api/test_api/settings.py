@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "corsheaders",
     # API stuff
-    "snippets",
     "operacion",
     "empleado",
     "clientes",
