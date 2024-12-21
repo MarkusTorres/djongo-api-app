@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 import json
+from tokens.views import _header_exists, auth_check
 
 
 CREADA = 'creada'
@@ -50,6 +51,11 @@ class OperacionViewSet(viewsets.ModelViewSet):
     serializer_class = OperacionSerializer
     pagination_class = OperacionesPagination
 
+    @auth_check()
+    def list(self, request, *args, **kwargs):
+        return super().list(request, args, kwargs)
+
+    @auth_check()
     @action(detail=True, methods=['get', 'put'], url_path='codigo')
     def codigo(self, request, pk=None):
         serializer_context = {

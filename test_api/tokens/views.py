@@ -16,6 +16,26 @@ from test_api.settings import SECRET_KEY
 
 
 # Create your views here.
+def _header_exists(headers, value):
+    if value not in headers.keys():
+        return None
+    return headers[value]
+
+
+def auth_check():
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            # breakpoint()
+            token_data = _header_exists(args[1].META, 'HTTP_TOKEN')
+            # add return for None on token_data
+            token_exists = list(Tokens.objects.filter(token=token_data))
+            if not token_exists:
+                return Response(data="Token is not valid", status=status.HTTP_400_BAD_REQUEST)
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 class AuthViewSet(viewsets.ModelViewSet):
     queryset = Tokens.objects.all()
     serializer_class = TokensSerializer
@@ -35,15 +55,10 @@ class AuthViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         raise Http404
 
-    def _header_exists(self, headers, value):
-        if value not in headers.keys():
-            return None
-        return headers[value]
-
     @action(detail=False, methods=['get'])
     def log_in(self, request, pk=None):
-        user_data = self._header_exists(request.META, 'HTTP_USER')
-        pass_data = self._header_exists(request.META, 'HTTP_PASS')
+        user_data = _header_exists(request.META, 'HTTP_USER')
+        pass_data = _header_exists(request.META, 'HTTP_PASS')
         users = None
         if not user_data or not pass_data:
             return Response(data="Credentials not specified", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -77,13 +92,14 @@ class AuthViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def log_out(self, request):
-        token_data = self._header_exists(request.META, 'HTTP_TOKEN')
+        token_data = _header_exists(request.META, 'HTTP_TOKEN')
         token_exists = Tokens.objects.get(token=token_data)
         if token_exists is None:
             return Response(data="Token is not valid", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         token_obj = Tokens.objects.filter(token__exact=token_data).get()
         token_obj.delete()
         return Response(data="Token successfully deleted", status=status.HTTP_200_OK)
+
 
 @api_view
 def api_root(request, format=None):
