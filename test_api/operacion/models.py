@@ -44,6 +44,7 @@ class Operacion(models.Model):
     entregas = models.PositiveIntegerField(blank=True, default=0)
 
     inventario_relacion = models.JSONField(blank=True)
+    codigo_postal = models.PositiveIntegerField(blank=False)
 
     class Meta:
         ordering = ["status"]

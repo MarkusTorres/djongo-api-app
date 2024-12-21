@@ -139,6 +139,7 @@ celerybeat.pid
 .venv
 env/
 venv/
+paqe_api/
 ENV/
 env.bak/
 venv.bak/

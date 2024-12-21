@@ -63,6 +63,7 @@ class OperacionViewSet(viewsets.ModelViewSet):
                 query_result.status = request.data['status']
                 query_result.direccion_inicio = request.data['direccion_inicio']
                 query_result.direccion_final = request.data['direccion_final']
+                query_result.codigo_postal = request.data['codigo_postal']
                 query_result.tarifa = request.data['tarifa']
                 query_result.fecha_inicio = request.data['fecha_inicio']
                 # query_result.fecha_final = request.data['fecha_final']
@@ -104,12 +105,13 @@ class OperacionViewSet(viewsets.ModelViewSet):
         data = request.data
         id = Operacion.objects.count() + 1
         new_item = Operacion.objects.create(
-            id=Operacion.objects.count() + 1,
+            id=id,
             id_tipo_operacion=data['id_tipo_operacion'],
             codigo=data['codigo'],
             status=data['status'],
             direccion_inicio=data['direccion_inicio'],
             direccion_final=data['direccion_final'],
+            codigo_postal=data['codigo_postal'],
             tarifa=data['tarifa'],
             # fecha_inicio=data['fecha_inicio'],
             fecha_final=data['fecha_final'],
@@ -140,12 +142,13 @@ class OperacionViewSet(viewsets.ModelViewSet):
 def insert_operacion(data, model):
     id = model.objects.count() + 1
     new_item = model.objects.create(
-        id=model.objects.count() + 1,
+        id=id,
         id_tipo_operacion=data['id_tipo_operacion'],
         codigo=data['codigo'],
         status=data['status'],
         direccion_inicio=data['direccion_inicio'],
         direccion_final=data['direccion_final'],
+        codigo_postal=data['codigo_postal'],
         tarifa=data['tarifa'],
         # fecha_inicio=data['fecha_inicio'],
         fecha_final=data['fecha_final'],

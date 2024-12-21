@@ -15,7 +15,8 @@ class ProveedorViewSet(viewsets.ModelViewSet):
         id = Proveedor.objects.count() + 1
         new_item = Proveedor.objects.create(
             id=Proveedor.objects.count() + 1,
-            nombre=data['nombre']
+            nombre=data['nombre'],
+            tarifa=data['tarifa']
         )
         new_item.id = id
         new_item.save()
