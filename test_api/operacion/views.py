@@ -111,7 +111,7 @@ class OperacionViewSet(viewsets.ModelViewSet):
             status=data['status'],
             direccion_inicio=data['direccion_inicio'],
             direccion_final=data['direccion_final'],
-            codigo_postal=data['codigo_postal'],
+            codigo_postal=data['codigo_postal'] if 'codigo_postal' in data.keys() else 0,
             tarifa=data['tarifa'],
             # fecha_inicio=data['fecha_inicio'],
             fecha_final=data['fecha_final'],
