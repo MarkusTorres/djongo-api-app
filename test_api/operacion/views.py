@@ -9,6 +9,7 @@ from operacion.serializers import FlujoSerializer
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework import viewsets, status
+from utils import base_utils
 from rest_framework import permissions
 from rest_framework import renderers
 from rest_framework.response import Response
@@ -46,14 +47,14 @@ class OperacionesPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
 
 
-class OperacionViewSet(viewsets.ModelViewSet):
+class OperacionViewSet(base_utils.GenericViewSetAuth):
     queryset = Operacion.objects.all()
     serializer_class = OperacionSerializer
     pagination_class = OperacionesPagination
 
-    @auth_check()
-    def list(self, request, *args, **kwargs):
-        return super().list(request, args, kwargs)
+    # @auth_check()
+    # def list(self, request, *args, **kwargs):
+    #     return super().list(request, args, kwargs)
 
     @auth_check()
     @action(detail=True, methods=['get', 'put'], url_path='codigo')
@@ -95,6 +96,7 @@ class OperacionViewSet(viewsets.ModelViewSet):
         except ObjectDoesNotExist:
             return Response(data=f'id {pk} not found', status=status.HTTP_400_BAD_REQUEST)
 
+    @auth_check()
     @action(detail=True, methods=['get'])
     def repartidor(self, request, pk=None):
         queryset = Operacion.objects.filter(repartidor__exact=pk)
@@ -106,6 +108,7 @@ class OperacionViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
+    @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
         id = Operacion.objects.count() + 1
@@ -179,6 +182,7 @@ class OperacionBulkViewSet(viewsets.ModelViewSet):
     queryset = Operacion.objects.all()
     serializer_class = OperacionSerializer
 
+    @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
         results = [insert_operacion(single_operacion, Operacion) for single_operacion in data]

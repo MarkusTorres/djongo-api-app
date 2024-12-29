@@ -5,12 +5,15 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
+from tokens.views import auth_check
+from utils import base_utils
 
 
-class EmpleadoViewSet(viewsets.ModelViewSet):
+class EmpleadoViewSet(base_utils.GenericViewSetAuth):
     queryset = Empleado.objects.all()
     serializer_class = EmpleadoSerializer
 
+    @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
         id = Empleado.objects.count() + 1

@@ -4,9 +4,11 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
+from tokens.views import auth_check
+from utils import base_utils
 
 
-class MunicipioViewSet(viewsets.ModelViewSet):
+class MunicipioViewSet(base_utils.GenericViewSetAuth):
     queryset = Municipio.objects.all()
     serializer_class = MunicipioSerializer
 

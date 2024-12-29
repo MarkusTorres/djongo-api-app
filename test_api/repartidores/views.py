@@ -4,12 +4,15 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
+from tokens.views import auth_check
+from utils import base_utils
 
 
-class RepartidorViewSet(viewsets.ModelViewSet):
+class RepartidorViewSet(base_utils.GenericViewSetAuth):
     queryset = Repartidor.objects.all()
     serializer_class = RepartidorSerializer
 
+    @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
         id = Repartidor.objects.count() + 1
