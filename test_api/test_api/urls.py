@@ -25,6 +25,7 @@ from repartidores import views as views_repartidores
 from proveedores import views as views_proveedores
 from inventario import views as views_inventario
 from municipio import views as views_municipios
+from tokens import views as views_tokens
 
 router = DefaultRouter()
 router.register(r'operacion', views_operacion.OperacionViewSet, basename='operacion')
@@ -36,9 +37,10 @@ router.register(r'clientes', views_clientes.ClienteViewSet, basename='cliente')
 router.register(r'proveedores', views_proveedores.ProveedorViewSet, basename='proveedor')
 router.register(r'inventario', views_inventario.InventarioViewSet, basename='inventario')
 router.register(r'municipios', views_municipios.MunicipioViewSet, basename='municipio')
+router.register(r'auth', views_tokens.AuthViewSet, basename='auth')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
+    # path('admin/', admin.site.urls),
+    # path('api-auth/', include('rest_framework.urls')),
 ]

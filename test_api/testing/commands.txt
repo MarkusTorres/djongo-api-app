@@ -1,1 +1,5 @@
 http -j POST http://127.0.0.1:8000/operacion-bulk/ < ./bulk-add.json -v
+
+http GET http://127.0.0.1:8000/operacion/ token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiSnVhbml0byJ9.81RyBVTtxSNtdWwd0LttdMuosZlA9VQLo8KsWt6xK04
+
+http GET http://127.0.0.1:8000/auth/log_in/ user:Juanito pass:1234

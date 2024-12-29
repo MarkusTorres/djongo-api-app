@@ -4,12 +4,15 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
+from tokens.views import auth_check
+from utils import base_utils
 
 
-class ClienteViewSet(viewsets.ModelViewSet):
+class ClienteViewSet(base_utils.GenericViewSetAuth):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
 
+    @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
         id = Cliente.objects.count() + 1

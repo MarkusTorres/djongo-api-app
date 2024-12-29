@@ -4,9 +4,11 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
+from tokens.views import auth_check
+from utils import base_utils
 
 
-class ProveedorViewSet(viewsets.ModelViewSet):
+class ProveedorViewSet(base_utils.GenericViewSetAuth):
     queryset = Proveedor.objects.all()
     serializer_class = ProveedorSerializer
 
