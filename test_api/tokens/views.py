@@ -62,14 +62,12 @@ class AuthViewSet(viewsets.ModelViewSet):
         if not user_data or not pass_data:
             return Response(data="Credentials not specified", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # check if user exists
-        users = Empleado.objects.get(nombre__exact=user_data)
-        if users is None:
+        try:
+            users = Empleado.objects.get(nombre__exact=user_data)
+            token_exists = Tokens.objects.get(user_id__exact=user_data)
+        except Empleado.DoesNotExist:
             return Response(data="User not found", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        token_exists = Tokens.objects.get(user_id__exact=user_data)
-        # if it does not exist create the token entry and return the token data
-        # if it does indeed exist return Error
-        if token_exists:
+        except Tokens.DoesNotExist:
             return Response(data="Token for user already created", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # create the entry on DB
         data = request.data
