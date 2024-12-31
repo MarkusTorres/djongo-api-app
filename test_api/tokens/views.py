@@ -28,8 +28,9 @@ def auth_check():
             # breakpoint()
             token_data = _header_exists(args[1].META, 'HTTP_TOKEN')
             # add return for None on token_data
-            token_exists = list(Tokens.objects.filter(token=token_data))
-            if not token_exists:
+            try:
+                Tokens.objects.get(token__exact=token_data)
+            except Tokens.DoesNotExist:
                 return Response(data="Token is not valid", status=status.HTTP_400_BAD_REQUEST)
             return func(*args, **kwargs)
         return wrapper
@@ -63,12 +64,15 @@ class AuthViewSet(viewsets.ModelViewSet):
             return Response(data="Credentials not specified", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # check if user exists
         try:
-            users = Empleado.objects.get(nombre__exact=user_data)
+            users = Empleado.objects.get(usuario_nombre__exact=user_data)
+            passwort = Empleado.objects.get(usuario_password__exact=pass_data)
             token_exists = Tokens.objects.get(user_id__exact=user_data)
+            if token_exists:
+                return Response(data="Token for user already created", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Empleado.DoesNotExist:
-            return Response(data="User not found", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data="User or password not found", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Tokens.DoesNotExist:
-            return Response(data="Token for user already created", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            pass
         # create the entry on DB
         data = request.data
         id = Tokens.objects.count() + 1
