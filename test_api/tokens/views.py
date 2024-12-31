@@ -59,16 +59,14 @@ class AuthViewSet(viewsets.ModelViewSet):
     def log_in(self, request, pk=None):
         user_data = _header_exists(request.META, 'HTTP_USER')
         pass_data = _header_exists(request.META, 'HTTP_PASS')
-        users = None
         if not user_data or not pass_data:
             return Response(data="Credentials not specified", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # check if user exists
-        try:
-            users = Empleado.objects.filter(nombre__exact=user_data).get()
-        except ObjectDoesNotExist:
+        users = Empleado.objects.get(nombre__exact=user_data)
+        if users is None:
             return Response(data="User not found", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        token_exists = Tokens.objects.filter(user_id__exact=user_data).exists()
+        token_exists = Tokens.objects.get(user_id__exact=user_data)
         # if it does not exist create the token entry and return the token data
         # if it does indeed exist return Error
         if token_exists:
