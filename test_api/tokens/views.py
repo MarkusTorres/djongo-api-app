@@ -93,12 +93,24 @@ class AuthViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def log_out(self, request):
         token_data = _header_exists(request.META, 'HTTP_TOKEN')
-        token_exists = Tokens.objects.get(token=token_data)
-        if token_exists is None:
+        try:
+            token_exists = Tokens.objects.get(token=token_data)
+        except Tokens.DoesNotExist:
             return Response(data="Token is not valid", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         token_obj = Tokens.objects.filter(token__exact=token_data).get()
         token_obj.delete()
         return Response(data="Token successfully deleted", status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def verify(self, request, pk=None):
+        token_data = _header_exists(request.META, 'HTTP_TOKEN')
+        token_value = None
+        try:
+            token_value = Tokens.objects.get(token=token_data)
+        except Tokens.DoesNotExist:
+            return Response(data="Token is not valid", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        serializer = TokensSerializer(token_value)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view
