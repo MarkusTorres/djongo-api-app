@@ -45,6 +45,7 @@ class Operacion(models.Model):
 
     inventario_relacion = models.JSONField(blank=True)
     codigo_postal = models.PositiveIntegerField(blank=False)
+    imagen = models.TextField(max_length=1000, blank=True)
 
     class Meta:
         ordering = ["status"]

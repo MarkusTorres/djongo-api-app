@@ -58,7 +58,8 @@ class AuthViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def log_in(self, request, pk=None):
-        user_data = _header_exists(request.META, 'HTTP_USER')
+        users = None
+        user_data = _header_exists(request.META, 'HTTP_USUARIO')
         pass_data = _header_exists(request.META, 'HTTP_PASS')
         if not user_data or not pass_data:
             return Response(data="Credentials not specified", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -79,7 +80,7 @@ class AuthViewSet(viewsets.ModelViewSet):
         user_encoded_token = jwt.encode({"user": user_data}, SECRET_KEY + str(time.time()), algorithm="HS256")
         new_token = Tokens.objects.create(
             id=id,
-            user_id=user_data,
+            user_id=users.id,
             token=user_encoded_token,
             created=dt.datetime.now().strftime('%Y-%m-%d')
         )
