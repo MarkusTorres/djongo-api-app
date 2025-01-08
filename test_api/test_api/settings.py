@@ -14,6 +14,7 @@ from pathlib import Path
 
 import os
 from django.core.management.utils import get_random_secret_key
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -66,6 +67,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    'token',
+    'usuario',
+    'pass',
+)
 
 CORS_ALLOW_ALL_ORIGINS = True
 
