@@ -9,6 +9,7 @@ from django.http import Http404
 from rest_framework.decorators import action
 import hashlib
 from django.core.exceptions import ObjectDoesNotExist
+from functools import wraps
 import jwt
 import time
 import datetime as dt
@@ -24,6 +25,7 @@ def _header_exists(headers, value):
 
 def auth_check():
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             # breakpoint()
             token_data = _header_exists(args[1].META, 'HTTP_TOKEN')

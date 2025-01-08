@@ -56,8 +56,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     # def list(self, request, *args, **kwargs):
     #     return super().list(request, args, kwargs)
 
-    @auth_check()
     @action(detail=True, methods=['get', 'put'], url_path='codigo')
+    @auth_check()
     def codigo(self, request, pk=None):
         serializer_context = {
             'request': request,
@@ -97,8 +97,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         except ObjectDoesNotExist:
             return Response(data=f'id {pk} not found', status=status.HTTP_400_BAD_REQUEST)
 
-    @auth_check()
     @action(detail=True, methods=['get'])
+    @auth_check()
     def repartidor(self, request, pk=None):
         queryset = Operacion.objects.filter(repartidor__exact=pk)
 
