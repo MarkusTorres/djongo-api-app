@@ -22,10 +22,10 @@ from tokens.views import _header_exists, auth_check
 CREADA = 'creada'
 AGENDADA = 'agendada'
 EN_RUTA = 'en ruta'
-CANCELADA = 'efectiva'
-EFECTIVA = 'transferencia'
-TRANSFERENCIA = 'reagendada'
-REAGENDADA = 'cancelada'
+CANCELADA = 'cancelada'
+EFECTIVA = 'efectiva'
+TRANSFERENCIA = 'transferencia'
+REAGENDADA = 'reagendada'
 ENTREGADA = 'entregada'
 FINALIZADA = 'finalizada'
 
@@ -87,6 +87,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                 query_result.alto = request.data['alto']
                 query_result.devoluciones = request.data['devoluciones']
                 query_result.entregas = request.data['entregas']
+                query_result.imagen = request.data['imagen']
 
                 query_result.save()
 
@@ -137,7 +138,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             alto=data['alto'],
             devoluciones=data['devoluciones'],
             entregas=data['entregas'],
-            inventario_relacion=data['inventario_relacion']
+            inventario_relacion=data['inventario_relacion'],
+            imagen=data['imagen']
         )
         # breakpoint()
         if new_item.id_tipo_operacion == 'producto' and new_item.inventario_relacion == '':
@@ -173,7 +175,8 @@ def insert_operacion(data, model):
         ancho=data['ancho'],
         alto=data['alto'],
         devoluciones=data['devoluciones'],
-        entregas=data['entregas']
+        entregas=data['entregas'],
+        imagen = data['imagen']
     )
     new_item.id = id
     new_item.save()
