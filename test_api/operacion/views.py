@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from django.http import Http404
 from operacion.models import Operacion
+from inventario.views import update_inventario
 from operacion.models import Flujo
 from operacion.serializers import OperacionSerializer
 from operacion.serializers import FlujoSerializer
@@ -40,6 +41,11 @@ flujo_operacion = {
     FINALIZADA: []
 }
 
+#
+# def check_if_field_exists(obj, field):
+#     if field in obj.__dict__.keys():
+#
+#
 
 class OperacionesPagination(PageNumberPagination):
     page_size = 20
@@ -52,11 +58,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     serializer_class = OperacionSerializer
     pagination_class = OperacionesPagination
 
-    # @auth_check()
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, args, kwargs)
-
-    @action(detail=True, methods=['get', 'put'], url_path='codigo')
+    @action(detail=True, methods=['get', 'put', 'patch'], url_path='codigo')
     @auth_check()
     def codigo(self, request, pk=None):
         serializer_context = {
@@ -66,31 +68,39 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         try:
             query_result = Operacion.objects.filter(codigo__exact=pk).get()
 
-            if self.request.method == 'PUT':
-                query_result.status = request.data['status']
-                query_result.direccion_inicio = request.data['direccion_inicio']
-                query_result.direccion_final = request.data['direccion_final']
-                query_result.codigo_postal = request.data['codigo_postal']
-                query_result.tarifa = request.data['tarifa']
-                query_result.fecha_inicio = request.data['fecha_inicio']
-                # query_result.fecha_final = request.data['fecha_final']
-                query_result.cantidad = request.data['cantidad']
-                query_result.comentario = request.data['comentario']
-                query_result.precio = request.data['precio']
-                query_result.nombre_referencia = request.data['nombre_referencia']
-                query_result.numero_referencia = request.data['numero_referencia']
-                query_result.repartidor = request.data['repartidor']
-                query_result.historial = request.data['historial']
-                query_result.peso = request.data['peso']
-                query_result.largo = request.data['largo']
-                query_result.ancho = request.data['ancho']
-                query_result.alto = request.data['alto']
-                query_result.devoluciones = request.data['devoluciones']
-                query_result.entregas = request.data['entregas']
-                query_result.imagen = request.data['imagen']
+            if self.request.method == 'PUT' or self.request.method == 'PATCH':
+                for field in request.data.keys():
+                    setattr(query_result, field, request.data[field])
 
+                if 'status' in request.data.keys():
+                    if request.data['status'] == EFECTIVA:
+                        update_inventario(query_result.inventario_relacion)
+                # query_result.status = request.data['status']
+                # query_result.direccion_inicio = request.data['direccion_inicio']
+                # query_result.direccion_final = request.data['direccion_final']
+                # query_result.codigo_postal = request.data['codigo_postal']
+                # query_result.tarifa = request.data['tarifa']
+                # query_result.fecha_inicio = request.data['fecha_inicio']
+                # # query_result.fecha_final = request.data['fecha_final']
+                # query_result.cantidad = request.data['cantidad']
+                # query_result.comentario = request.data['comentario']
+                # query_result.precio = request.data['precio']
+                # query_result.nombre_referencia = request.data['nombre_referencia']
+                # query_result.numero_referencia = request.data['numero_referencia']
+                # query_result.repartidor = request.data['repartidor']
+                # query_result.historial = request.data['historial']
+                # query_result.peso = request.data['peso']
+                # query_result.largo = request.data['largo']
+                # query_result.ancho = request.data['ancho']
+                # query_result.alto = request.data['alto']
+                # query_result.devoluciones = request.data['devoluciones']
+                # query_result.entregas = request.data['entregas']
+                # query_result.inventario_relacion = request.data['inventario_relacion']
+                # query_result.imagen = request.data['imagen']
+                # workaround for Decimal128 type from pymongo
+                query_result.precio = float(str(query_result.precio))
+                query_result.tarifa = float(str(query_result.tarifa))
                 query_result.save()
-
 
             serializer = OperacionSerializer(query_result, context=serializer_context)
 
@@ -113,41 +123,12 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
-        id = Operacion.objects.count() + 1
-        new_item = Operacion.objects.create(
-            id=id,
-            id_tipo_operacion=data['id_tipo_operacion'],
-            codigo=data['codigo'],
-            status=data['status'],
-            direccion_inicio=data['direccion_inicio'],
-            direccion_final=data['direccion_final'],
-            codigo_postal=data['codigo_postal'] if 'codigo_postal' in data.keys() else 0,
-            tarifa=data['tarifa'],
-            # fecha_inicio=data['fecha_inicio'],
-            fecha_final=data['fecha_final'],
-            cantidad=data['cantidad'],
-            comentario=data['comentario'],
-            precio=data['precio'],
-            nombre_referencia=data['nombre_referencia'],
-            numero_referencia=data['numero_referencia'],
-            repartidor=data['repartidor'],
-            historial=data['historial'],
-            peso=data['peso'],
-            largo=data['largo'],
-            ancho=data['ancho'],
-            alto=data['alto'],
-            devoluciones=data['devoluciones'],
-            entregas=data['entregas'],
-            inventario_relacion=data['inventario_relacion'],
-            imagen=data['imagen']
-        )
-        # breakpoint()
-        if new_item.id_tipo_operacion == 'producto' and new_item.inventario_relacion == '':
+        if data['id_tipo_operacion'] == 'producto' and data['inventario_relacion'] == '':
             raise ValidationError(detail="Operacion tipo producto debe especificar inventario", code=500)
-        new_item.id = id
-        new_item.save()
-        serializer = OperacionSerializer(new_item)
-        return Response(serializer.data)
+
+        new_operacion = insert_operacion(data, Operacion)
+
+        return Response(new_operacion)
 
 
 def insert_operacion(data, model):
@@ -176,7 +157,8 @@ def insert_operacion(data, model):
         alto=data['alto'],
         devoluciones=data['devoluciones'],
         entregas=data['entregas'],
-        imagen = data['imagen']
+        inventario_relacion=data['inventario_relacion'],
+        imagen=data['imagen']
     )
     new_item.id = id
     new_item.save()

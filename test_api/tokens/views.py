@@ -89,8 +89,6 @@ class AuthViewSet(viewsets.ModelViewSet):
         new_token.id = id
         new_token.save()
         serializer = TokensSerializer(new_token)
-        # TODO: add cp on 'operacion', delete dates on 'empleado' and create and endpoint
-        #  for checking if a code is already created on operacion
         return Response(serializer.data)
 
     @action(detail=False, methods=['post'])
