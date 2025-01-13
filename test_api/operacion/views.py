@@ -132,6 +132,9 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
 
 def insert_operacion(data, model):
+
+    value_or_default = lambda data_struct, value: value in data_struct.keys()
+
     id = model.objects.count() + 1
     new_item = model.objects.create(
         id=id,
@@ -158,10 +161,10 @@ def insert_operacion(data, model):
         devoluciones=data['devoluciones'],
         entregas=data['entregas'],
         inventario_relacion=data['inventario_relacion'],
-        imagen=data['imagen'],
-        imagen_opcional=data['imagen_opcional'],
-        monicipio_id=data['monicipio_id'],
-        municipio_nombre=data['municipio_nombre'],
+        imagen=data['imagen'] if value_or_default(data, 'imagen') else '',
+        imagen_opcional=data['imagen_opcional'] if value_or_default(data, 'imagen_opcional') else '',
+        monicipio_id=data['monicipio_id'] if value_or_default(data, 'monicipio_id') else 0,
+        municipio_nombre=data['municipio_nombre'] if value_or_default(data, 'municipio_nombre') else '',
     )
     new_item.id = id
     new_item.save()
