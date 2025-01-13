@@ -158,7 +158,10 @@ def insert_operacion(data, model):
         devoluciones=data['devoluciones'],
         entregas=data['entregas'],
         inventario_relacion=data['inventario_relacion'],
-        imagen=data['imagen']
+        imagen=data['imagen'],
+        imagen_opcional=data['imagen_opcional'],
+        monicipio_id=data['monicipio_id'],
+        municipio_nombre=data['municipio_nombre'],
     )
     new_item.id = id
     new_item.save()

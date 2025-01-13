@@ -45,7 +45,10 @@ class Operacion(models.Model):
 
     inventario_relacion = models.JSONField(blank=True)
     codigo_postal = models.PositiveIntegerField(blank=False)
-    imagen = models.TextField(max_length=1000, blank=True)
+    imagen = models.TextField(blank=True)
+    imagen_opcional = models.TextField(blank=True)
+    monicipio_id = models.IntegerField(blank=True, default=0)
+    municipio_nombre = models.TextField(blank=True, default='ninguno')
 
     class Meta:
         ordering = ["status"]
