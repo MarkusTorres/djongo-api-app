@@ -120,6 +120,30 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    @auth_check()
+    def filtro(self, request, pk=None):
+        data = request.data
+        queries_list = [
+            Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']),
+            Operacion.objects.filter(codigo=data['codigo']),
+            Operacion.objects.filter(status=data['status'])
+        ]
+        queryset = Operacion.objects.all()
+
+        breakpoint()
+
+        for query in queries_list:
+            if query:
+                queryset = queryset & query
+
+        serializer_context = {
+            'request': request,
+        }
+        serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
+
+        return Response(serializer.data)
+
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
