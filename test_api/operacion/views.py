@@ -120,18 +120,20 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'])
-    @auth_check()
+    @action(detail=False, methods=['post'])
+    # @auth_check()
     def filtro(self, request, pk=None):
-        data = request.data
-        queries_list = [
-            Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']),
-            Operacion.objects.filter(codigo=data['codigo']),
-            Operacion.objects.filter(status=data['status'])
-        ]
-        queryset = Operacion.objects.all()
-
-        breakpoint()
+        try:
+            data = request.data
+            queries_list = [
+                Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']),
+                Operacion.objects.filter(codigo=data['codigo']),
+                Operacion.objects.filter(status=data['status'])
+            ]
+            queryset = Operacion.objects.all()
+        except e:
+            return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
+        # breakpoint()
 
         for query in queries_list:
             if query:
