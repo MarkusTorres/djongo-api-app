@@ -50,6 +50,11 @@ class Operacion(models.Model):
     monicipio_id = models.IntegerField(blank=True, default=0)
     municipio_nombre = models.TextField(blank=True, default='ninguno')
 
+    # finalizado ahora es un campo
+    finalizada = models.BooleanField(blank=True, default=False)
+    # pagado will work as a flag on the reports
+    pagado = models.BooleanField(blank=True, default=False)
+
     class Meta:
         ordering = ["status"]
 

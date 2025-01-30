@@ -365,3 +365,4 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,django,pycharm
 /test_api/testing/output.html
+/test_api/testing/

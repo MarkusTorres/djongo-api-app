@@ -28,7 +28,6 @@ EFECTIVA = 'efectiva'
 TRANSFERENCIA = 'transferencia'
 REAGENDADA = 'reagendada'
 ENTREGADA = 'entregada'
-FINALIZADA = 'finalizada'
 
 flujo_operacion = {
     CREADA: [AGENDADA],
@@ -36,9 +35,8 @@ flujo_operacion = {
     EN_RUTA: [EFECTIVA, TRANSFERENCIA, REAGENDADA, CANCELADA],
     EFECTIVA: [REAGENDADA, CANCELADA],
     TRANSFERENCIA: [REAGENDADA, CANCELADA, ENTREGADA],
-    CANCELADA: [ENTREGADA, FINALIZADA],
-    ENTREGADA: [FINALIZADA],
-    FINALIZADA: []
+    CANCELADA: [ENTREGADA],
+    ENTREGADA: []
 }
 
 #
@@ -72,8 +70,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                 for field in request.data.keys():
                     setattr(query_result, field, request.data[field])
 
-                if 'status' in request.data.keys():
-                    if request.data['status'] == EFECTIVA:
+                if 'finalizada' in request.data.keys():
+                    if request.data['finalizada'] == 1:
                         update_inventario(query_result.inventario_relacion)
                 # query_result.status = request.data['status']
                 # query_result.direccion_inicio = request.data['direccion_inicio']

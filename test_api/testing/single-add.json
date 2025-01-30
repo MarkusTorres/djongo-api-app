@@ -20,5 +20,12 @@
     "alto": 10,
     "devoluciones": 0,
     "entregas": 0,
-    "inventario_relacion": ""
+    "codigo_postal": "23908",
+    "inventario_relacion": "{}",
+    "imagen": "",
+    "imagen_opcional": "",
+    "monicipio_id": null,
+    "municipio_nombre": "Tlaxcala",
+    "finalizada": false,
+    "pagado": false
 }
