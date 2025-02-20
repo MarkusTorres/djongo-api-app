@@ -189,10 +189,62 @@ def insert_operacion(data, model):
         imagen_opcional=data['imagen_opcional'] if value_or_default(data, 'imagen_opcional') else '',
         monicipio_id=data['monicipio_id'] if value_or_default(data, 'monicipio_id') else 0,
         municipio_nombre=data['municipio_nombre'] if value_or_default(data, 'municipio_nombre') else '',
+        finalizada=data['finalizada'],
+        pagado=data['pagado'],
     )
     new_item.id = id
     new_item.save()
     serializer_class = OperacionSerializer(new_item)
+    return serializer_class.data
+
+
+def bulk_update(data, model):
+
+    def value_or_default(key, data_struct, default):
+        if key not in data_struct.keys():
+            return default
+        else:
+            return data_struct[key]
+
+    # value_or_default = lambda key, data_struct, default: data_struct.get(key) if key in data_struct.keys() else default
+    operacion_obj = model.objects.filter(id__exact=data['id']).get()
+    breakpoint()
+    # operacion_obj.id_tipo_operacion = value_or_default('id_tipo_operacion', data, operacion_obj.id_tipo_operacion),
+    operacion_obj.codigo = value_or_default('codigo', data, operacion_obj.codigo)
+    operacion_obj.status = value_or_default('status', data, operacion_obj.status)
+    operacion_obj.direccion_inicio = value_or_default('direccion_inicio', data, operacion_obj.direccion_inicio)
+    operacion_obj.direccion_final = value_or_default('direccion_final', data, operacion_obj.direccion_final)
+    operacion_obj.codigo_postal = value_or_default('codigo_postal', data, operacion_obj.codigo_postal)
+    operacion_obj.tarifa = float(str(value_or_default('tarifa', data, operacion_obj.tarifa)))
+    operacion_obj.fecha_final = value_or_default('fecha_final', data, operacion_obj.fecha_final)
+    operacion_obj.cantidad = value_or_default('cantidad', data, operacion_obj.cantidad)
+    operacion_obj.comentario = value_or_default('comentario', data, operacion_obj.comentario)
+    operacion_obj.precio = float(str(value_or_default('precio', data, operacion_obj.precio)))
+    operacion_obj.nombre_referencia = value_or_default('nombre_referencia', data, operacion_obj.nombre_referencia)
+    # operacion_obj.numero_referencia = value_or_default('numero_referencia', data, operacion_obj.numero_referencia)
+    operacion_obj.repartidor = value_or_default('repartidor', data, operacion_obj.repartidor)
+    operacion_obj.historial = value_or_default('historial', data, operacion_obj.historial)
+    operacion_obj.peso = value_or_default('peso', data, operacion_obj.peso)
+    operacion_obj.largo = value_or_default('largo', data, operacion_obj.largo)
+    operacion_obj.ancho = value_or_default('ancho', data, operacion_obj.ancho)
+    operacion_obj.alto = value_or_default('alto', data, operacion_obj.alto)
+    operacion_obj.devoluciones = value_or_default('devoluciones', data, operacion_obj.devoluciones)
+    operacion_obj.entregas = value_or_default('entregas', data, operacion_obj.entregas)
+    operacion_obj.inventario_relacion = value_or_default('inventario_relacion', data, operacion_obj.inventario_relacion)
+    # operacion_obj.imagen = value_or_default('imagen', data, operacion_obj.imagen)
+    operacion_obj.imagen_opcional = value_or_default('imagen_opcional', data, operacion_obj.imagen_opcional)
+    operacion_obj.monicipio_id = value_or_default('monicipio_id', data, operacion_obj.monicipio_id)
+    operacion_obj.municipio_nombre = value_or_default('municipio_nombre', data, operacion_obj.municipio_nombre)
+    operacion_obj.finalizada = value_or_default('finalizada', data, operacion_obj.finalizada)
+    operacion_obj.pagado = value_or_default('pagado', data, operacion_obj.pagado)
+    # operacion_obj.tarifa = operacion_obj.tarifa[0]
+    # operacion_obj.precio = operacion_obj.precio[0]
+    operacion_obj.fecha_inicio = str(operacion_obj.fecha_inicio)
+    operacion_obj.fecha_final = str(operacion_obj.fecha_final)
+    breakpoint()
+    operacion_obj.save()
+
+    serializer_class = OperacionSerializer(operacion_obj)
     return serializer_class.data
 
 
@@ -219,6 +271,15 @@ class OperacionBulkViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         raise Http404
+
+    @action(detail=False, methods=['post'])
+    @auth_check()
+    def edit(self, request, pk=None):
+        data = request.data
+        results = [bulk_update(single_operacion, Operacion) for single_operacion in data]
+        serializer = self.get_serializer(data=request.data, many=True)
+        headers = self.get_success_headers(results)
+        return Response(results, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class FlujoViewSet(viewsets.ReadOnlyModelViewSet):
