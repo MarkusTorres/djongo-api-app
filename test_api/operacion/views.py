@@ -208,7 +208,6 @@ def bulk_update(data, model):
 
     # value_or_default = lambda key, data_struct, default: data_struct.get(key) if key in data_struct.keys() else default
     operacion_obj = model.objects.filter(id__exact=data['id']).get()
-    breakpoint()
     # operacion_obj.id_tipo_operacion = value_or_default('id_tipo_operacion', data, operacion_obj.id_tipo_operacion),
     operacion_obj.codigo = value_or_default('codigo', data, operacion_obj.codigo)
     operacion_obj.status = value_or_default('status', data, operacion_obj.status)
@@ -241,7 +240,6 @@ def bulk_update(data, model):
     # operacion_obj.precio = operacion_obj.precio[0]
     operacion_obj.fecha_inicio = str(operacion_obj.fecha_inicio)
     operacion_obj.fecha_final = str(operacion_obj.fecha_final)
-    breakpoint()
     operacion_obj.save()
 
     serializer_class = OperacionSerializer(operacion_obj)

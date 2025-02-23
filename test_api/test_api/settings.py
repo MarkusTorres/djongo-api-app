@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "proveedores",
     "inventario",
     "municipio",
+    "prestamos",
     "tokens"
 ]
 
