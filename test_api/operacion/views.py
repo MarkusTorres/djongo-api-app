@@ -280,9 +280,9 @@ class OperacionBulkViewSet(viewsets.ModelViewSet):
             results.append(result)
 
         operacion_list = Operacion.objects.bulk_create(results)
-        serializer = self.get_serialier(data=request.data, many=True)
+        # serializer = self.get_serialier(data=request.data, many=True)
         headers = self.get_success_headers(operacion_list)
-        return Response(operacion_list, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(f'{len(operacion_list)} operaciones fueron agregadas', status=status.HTTP_201_CREATED, headers=headers)
 
     def list(self, request, *args, **kwargs):
         raise Http404
