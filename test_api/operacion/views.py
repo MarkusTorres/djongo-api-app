@@ -126,7 +126,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             queries_list = [
                 Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']),
                 Operacion.objects.filter(codigo=data['codigo']),
-                Operacion.objects.filter(status=data['status'])
+                Operacion.objects.filter(status=data['status']),
+                Operacion.objects.filter(status=data['repartidor'])
             ]
             queryset = Operacion.objects.all()
         except e:
@@ -155,8 +156,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         return Response(new_operacion)
 
 
-def insert_operacion(data, model):
-
+def create_obj_operacion(data, model):
     value_or_default = lambda data_struct, value: value in data_struct.keys()
 
     id = model.objects.count() + 1
@@ -193,9 +193,24 @@ def insert_operacion(data, model):
         pagado=data['pagado'],
     )
     new_item.id = id
-    new_item.save()
-    serializer_class = OperacionSerializer(new_item)
+
+    return new_item
+
+
+def insert_operacion(data, model):
+    new_obj_operacion = create_obj_operacion(data, model)
+    new_obj_operacion.save()
+    serializer_class = OperacionSerializer(new_obj_operacion)
     return serializer_class.data
+
+
+def validate_obj_operacion(obj):
+    valid = True
+
+    if obj.direccion_inicio == '' or obj.codigo_postal == '' or obj.cantidad == '' or obj.codigo == '':
+        valid = False
+
+    return valid
 
 
 def bulk_update(data, model):
@@ -253,10 +268,21 @@ class OperacionBulkViewSet(viewsets.ModelViewSet):
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
-        results = [insert_operacion(single_operacion, Operacion) for single_operacion in data]
-        serializer = self.get_serializer(data=request.data, many=True)
-        headers = self.get_success_headers(results)
-        return Response(results, status=status.HTTP_201_CREATED, headers=headers)
+        # results = [insert_operacion(single_operacion, Operacion) for single_operacion in data]
+        results = []
+        for operacion_data in data:
+            result = create_obj_operacion(operacion_data, Operacion)
+            valid_obj = validate_obj_operacion(result)
+            if not valid_obj:
+                return Response(f"La operacion {result.codigo} tiene datos incorrectos o con formato erroneo",
+                                status=status.HTTP_200_OK)
+
+            results.append(result)
+
+        operacion_list = Operacion.objects.bulk_create(results)
+        serializer = self.get_serialier(data=request.data, many=True)
+        headers = self.get_success_headers(operacion_list)
+        return Response(operacion_list, status=status.HTTP_201_CREATED, headers=headers)
 
     def list(self, request, *args, **kwargs):
         raise Http404
