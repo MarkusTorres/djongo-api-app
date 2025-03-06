@@ -127,7 +127,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                 Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']),
                 Operacion.objects.filter(codigo=data['codigo']),
                 Operacion.objects.filter(status=data['status']),
-                Operacion.objects.filter(status=data['repartidor'])
+                Operacion.objects.filter(repartidor=data['repartidor'])
             ]
             queryset = Operacion.objects.all()
         except e:
