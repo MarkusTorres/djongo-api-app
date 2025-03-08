@@ -189,8 +189,8 @@ def create_obj_operacion(data, model):
         imagen_opcional=data['imagen_opcional'] if value_or_default(data, 'imagen_opcional') else '',
         monicipio_id=data['monicipio_id'] if value_or_default(data, 'monicipio_id') else 0,
         municipio_nombre=data['municipio_nombre'] if value_or_default(data, 'municipio_nombre') else '',
-        finalizada=data['finalizada'],
-        pagado=data['pagado'],
+        finalizada=data['finalizada'] if value_or_default(data, 'finalizada') else False,
+        pagado=data['pagado'] if value_or_default(data, 'pagado') else False,
     )
     new_item.id = id
 
