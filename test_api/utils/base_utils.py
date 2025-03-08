@@ -23,3 +23,10 @@ class GenericViewSetAuth(viewsets.ModelViewSet):
     @auth_check()
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
+
+
+def value_or_default(key, data_struct, default):
+    if key not in data_struct.keys():
+        return default
+    else:
+        return data_struct[key]

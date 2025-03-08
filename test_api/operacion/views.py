@@ -155,6 +155,14 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
         return Response(new_operacion)
 
+    @auth_check()
+    def update(self, request, *args, **kwargs):
+        id_obj = kwargs['id']
+        data = request.data
+        data['id'] = id_obj
+        results = bulk_update(data, Operacion)
+        return Response(results, status=status.HTTP_201_CREATED)
+
 
 def create_obj_operacion(data, model):
     value_or_default = lambda data_struct, value: value in data_struct.keys()
