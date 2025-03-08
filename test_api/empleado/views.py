@@ -51,7 +51,7 @@ class EmpleadoViewSet(base_utils.GenericViewSetAuth):
         empleado_obj.save()
         serialized_obj = EmpleadoSerializer(empleado_obj)
 
-        return Response(serialized_obj, status=status.HTTP_200_OK)
+        return Response(serialized_obj.data, status=status.HTTP_200_OK)
 
 
 @api_view
