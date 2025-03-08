@@ -36,7 +36,7 @@ class EmpleadoViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def update(self, request, *args, **kwargs):
         data = request.data
-        id_obj = kwargs['id']
+        id_obj = kwargs['pk']
         empleado_obj = Empleado.objects.get(id=id_obj)
 
         empleado_obj.id_tipo = base_utils.value_or_default('id_tipo', data, empleado_obj.id_tipo)

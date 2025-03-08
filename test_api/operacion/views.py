@@ -157,7 +157,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
     @auth_check()
     def update(self, request, *args, **kwargs):
-        id_obj = kwargs['id']
+        id_obj = kwargs['pk']
         data = request.data
         data['id'] = id_obj
         results = bulk_update(data, Operacion)
