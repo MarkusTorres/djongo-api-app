@@ -67,13 +67,17 @@ class AuthViewSet(viewsets.ModelViewSet):
             return Response(data="Credentials not specified", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # check if user exists
         try:
-            users = Empleado.objects.get(usuario_nombre__exact=user_data)
-            passwort = Empleado.objects.get(usuario_password__exact=pass_data)
-            token_exists = Tokens.objects.get(user_id__exact=user_data)
+            users = Empleado.objects.filter(usuario_nombre__exact=user_data) & Empleado.objects.filter(usuario_password__exact=pass_data)
+            # passwort = Empleado.objects.filter(usuario_password__exact=pass_data)
+            token_exists = Tokens.objects.get(user_id__exact=users.id)
             if token_exists:
                 return Response(data="Token for user already created", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Empleado.DoesNotExist:
             return Response(data="User or password not found", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Empleado.MultipleObjectsReturned:
+            return Response(data="User or password duplicated in DB!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Tokens.MultipleObjectsReturned:
+            return Response(data="Token duplicated in DB!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Tokens.DoesNotExist:
             pass
         # create the entry on DB
