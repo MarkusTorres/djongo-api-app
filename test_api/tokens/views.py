@@ -69,7 +69,11 @@ class AuthViewSet(viewsets.ModelViewSet):
         try:
             users = Empleado.objects.filter(usuario_nombre__exact=user_data) & Empleado.objects.filter(usuario_password__exact=pass_data)
             # passwort = Empleado.objects.filter(usuario_password__exact=pass_data)
-            token_exists = Tokens.objects.get(user_id__exact=users.id)
+            if users is None:
+                raise Empleado.DoesNotExist
+            user_obj = users.get()
+
+            token_exists = Tokens.objects.get(user_id__exact=user_obj.id)
             if token_exists:
                 return Response(data="Token for user already created", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Empleado.DoesNotExist:
@@ -86,7 +90,7 @@ class AuthViewSet(viewsets.ModelViewSet):
         user_encoded_token = jwt.encode({"user": user_data}, SECRET_KEY + str(time.time()), algorithm="HS256")
         new_token = Tokens.objects.create(
             id=id,
-            user_id=users.id,
+            user_id=user_obj.id,
             token=user_encoded_token,
             created=dt.datetime.now().strftime('%Y-%m-%d')
         )
