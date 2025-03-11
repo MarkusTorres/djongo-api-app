@@ -75,7 +75,8 @@ class AuthViewSet(viewsets.ModelViewSet):
 
             token_exists = Tokens.objects.get(user_id__exact=user_obj.id)
             if token_exists:
-                return Response(data="Token for user already created", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                serializer = TokensSerializer(token_exists)
+                return Response(serializer.data)
         except Empleado.DoesNotExist:
             return Response(data="User or password not found", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Empleado.MultipleObjectsReturned:
