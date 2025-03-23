@@ -167,7 +167,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 def create_obj_operacion(data, model):
     value_or_default = lambda data_struct, value: value in data_struct.keys()
 
-    id = model.objects.count() + 1
+    id = 0
     new_item = model.objects.create(
         id=id,
         id_tipo_operacion=data['id_tipo_operacion'],
@@ -200,14 +200,14 @@ def create_obj_operacion(data, model):
         finalizada=data['finalizada'] if value_or_default(data, 'finalizada') else False,
         pagado=data['pagado'] if value_or_default(data, 'pagado') else False,
     )
-    new_item.id = id
+    new_item.id = model.objects.count() + 1
 
     return new_item
 
 
 def insert_operacion(data, model):
     new_obj_operacion = create_obj_operacion(data, model)
-    new_obj_operacion.save()
+    # new_obj_operacion.save()
     serializer_class = OperacionSerializer(new_obj_operacion)
     return serializer_class.data
 
