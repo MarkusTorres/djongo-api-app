@@ -14,17 +14,15 @@ class MunicipioViewSet(base_utils.GenericViewSetAuth):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        id = Municipio.objects.count() + 1
+        max_id = base_utils.get_model_new_id(Municipio)
         new_item = Municipio.objects.create(
-            id=Municipio.objects.count()+1,
+            id=max_id,
             nombre=data['nombre'],
             precio=data['precio']
         )
-        new_item.id = id
-        # breakpoint()
-        new_item.save()
         serializer = MunicipioSerializer(new_item)
         return Response(serializer.data)
+
 
 @api_view
 def api_root(request, format=None):

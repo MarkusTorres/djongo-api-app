@@ -16,9 +16,8 @@ class EmpleadoViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
-        id = Empleado.objects.count() + 1
         new_item = Empleado.objects.create(
-            id=Empleado.objects.count() + 1,
+            id=base_utils.get_model_new_id(Empleado),
             id_tipo=data['id_tipo'],
             nombre=data['nombre'],
             posicion=data['posicion'],
@@ -28,8 +27,6 @@ class EmpleadoViewSet(base_utils.GenericViewSetAuth):
             fecha_inicio=data['fecha_inicio'],
             fecha_final=data['fecha_final']
         )
-        new_item.id = id
-        new_item.save()
         serializer = EmpleadoSerializer(new_item)
         return Response(serializer.data)
 

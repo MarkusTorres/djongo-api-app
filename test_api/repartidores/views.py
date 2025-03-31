@@ -15,15 +15,12 @@ class RepartidorViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
-        id = Repartidor.objects.count() + 1
         new_item = Repartidor.objects.create(
-            id=Repartidor.objects.count() + 1,
+            id=base_utils.get_model_new_id(Repartidor),
             nombre=data['nombre'],
             sueldo=data['sueldo'],
             id_prestamo=data['id_prestamo']
         )
-        new_item.id = id
-        new_item.save()
         serializer = RepartidorSerializer(new_item)
         return Response(serializer.data)
 

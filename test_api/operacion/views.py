@@ -45,6 +45,7 @@ flujo_operacion = {
 #
 #
 
+
 class OperacionesPagination(PageNumberPagination):
     page_size = 20
     max_page_size = 100
@@ -130,7 +131,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                 Operacion.objects.filter(repartidor=data['repartidor'])
             ]
             queryset = Operacion.objects.all()
-        except e:
+        except ObjectDoesNotExist:
             return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
         # breakpoint()
 
@@ -167,9 +168,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 def create_obj_operacion(data, model):
     value_or_default = lambda data_struct, value: value in data_struct.keys()
 
-    id = 0
     new_item = model.objects.create(
-        id=id,
+        id=base_utils.get_model_new_id(Operacion),
         id_tipo_operacion=data['id_tipo_operacion'],
         codigo=data['codigo'],
         status=data['status'],
@@ -200,7 +200,6 @@ def create_obj_operacion(data, model):
         finalizada=data['finalizada'] if value_or_default(data, 'finalizada') else False,
         pagado=data['pagado'] if value_or_default(data, 'pagado') else False,
     )
-    new_item.id = model.objects.count() + 1
 
     return new_item
 
@@ -229,7 +228,6 @@ def bulk_update(data, model):
         else:
             return data_struct[key]
 
-    # value_or_default = lambda key, data_struct, default: data_struct.get(key) if key in data_struct.keys() else default
     operacion_obj = model.objects.filter(id__exact=data['id']).get()
     # operacion_obj.id_tipo_operacion = value_or_default('id_tipo_operacion', data, operacion_obj.id_tipo_operacion),
     operacion_obj.codigo = value_or_default('codigo', data, operacion_obj.codigo)

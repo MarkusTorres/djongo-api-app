@@ -8,7 +8,6 @@ from tokens.views import auth_check
 from utils import base_utils
 import json
 
-
 def update_inventario(json_obj: str):
     items = json.loads(json_obj)
     targets = []
@@ -32,15 +31,12 @@ class InventarioViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
-        id = Inventario.objects.count()
         new_item = Inventario.objects.create(
-            id=Inventario.objects.count(),
+            id=base_utils.get_model_new_id(Inventario),
             concepto=data['concepto'],
             cantidad=data['cantidad'],
             comentario=data['comentario']
         )
-        new_item.id = id
-        new_item.save()
         serializer = InventarioSerializer(new_item)
         return Response(serializer.data)
 

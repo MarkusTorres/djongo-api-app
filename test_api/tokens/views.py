@@ -95,8 +95,8 @@ class AuthViewSet(viewsets.ModelViewSet):
             token=user_encoded_token,
             created=dt.datetime.now().strftime('%Y-%m-%d')
         )
-        new_token.id = id
-        new_token.save()
+        # new_token.id = id
+        # new_token.save()
         serializer = TokensSerializer(new_token)
         return Response(serializer.data)
 

@@ -1,8 +1,11 @@
 from django.db import models
+from djongo import models
 import datetime
 
 
 class Prestamo(models.Model):
+    _id = models.ObjectIdField()
+    id = models.PositiveIntegerField(default=0, blank=False)
     id_empleado = models.IntegerField(blank=False, default=0)
     cantidad = models.PositiveIntegerField(blank=False)
     remanente = models.PositiveIntegerField(blank=False)

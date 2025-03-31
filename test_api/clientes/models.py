@@ -1,8 +1,11 @@
 from django.db import models
+from djongo import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 # Create your models here.
 class Cliente(models.Model):
+    _id = models.ObjectIdField()
+    id = models.PositiveIntegerField(default=0, blank=False)
     id_tipo = models.IntegerField(choices=[(1, 'Interno'), (2, 'Externo'), (3, 'Tercero')])
     nombre = models.CharField(max_length=50, default='', blank=False)
     calle = models.CharField(max_length=100, default='', blank=False)

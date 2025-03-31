@@ -6,4 +6,4 @@ class RepartidorSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Repartidor
-        fields = ['nombre', 'sueldo']
+        fields = ['id','nombre', 'sueldo']

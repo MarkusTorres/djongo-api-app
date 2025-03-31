@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from tokens.views import auth_check
+from django.db.models import Max
 
 
 class GenericViewSetAuth(viewsets.ModelViewSet):
@@ -30,3 +31,10 @@ def value_or_default(key, data_struct, default):
         return default
     else:
         return data_struct[key]
+
+
+def get_model_new_id(model):
+    max_id = model.objects.aggregate(Max('id'))['id__max']
+    max_id = 0 if max_id is None else max_id
+
+    return max_id + 1

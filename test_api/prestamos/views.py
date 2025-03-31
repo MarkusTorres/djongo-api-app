@@ -20,10 +20,8 @@ class PrestamosViewSet(viewsets.ModelViewSet):
     # @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
-        id = Prestamo.objects.count()+1
-
         new_item = Prestamo.objects.create(
-            id=id,
+            id=base_utils.get_model_new_id(Prestamo),
             id_empleado=data['id_empleado'],
             cantidad=data['cantidad'],
             remanente=data['cantidad'],
@@ -31,9 +29,6 @@ class PrestamosViewSet(viewsets.ModelViewSet):
             liquidado=False,
             historial={}    # default historial value
         )
-        new_item.id = id
-        new_item.save()
-
         # serializer = self.get_serializer(data=request.data, many=True)
         serializer = PrestamoSerializer(new_item)
         headers = self.get_success_headers(new_item)

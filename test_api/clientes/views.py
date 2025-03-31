@@ -15,9 +15,8 @@ class ClienteViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
-        id = Cliente.objects.count() + 1
         new_item = Cliente.objects.create(
-            id=Cliente.objects.count() + 1,
+            id=base_utils.get_model_new_id(Cliente),
             id_tipo=data['id_tipo'],
             nombre=data['nombre'],
             calle=data['calle'],
@@ -34,8 +33,6 @@ class ClienteViewSet(base_utils.GenericViewSetAuth):
             tarifa=data['tarifa'],
             nota=data['nota']
         )
-        new_item.id = id
-        new_item.save()
         serializer = ClienteSerializer(new_item)
         return Response(serializer.data)
 

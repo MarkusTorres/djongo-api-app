@@ -14,14 +14,11 @@ class ProveedorViewSet(base_utils.GenericViewSetAuth):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        id = Proveedor.objects.count() + 1
         new_item = Proveedor.objects.create(
-            id=Proveedor.objects.count() + 1,
+            id=base_utils.get_model_new_id(Proveedor),
             nombre=data['nombre'],
             tarifa=data['tarifa']
         )
-        new_item.id = id
-        new_item.save()
         serializer = ProveedorSerializer(new_item)
         return Response(serializer.data)
 

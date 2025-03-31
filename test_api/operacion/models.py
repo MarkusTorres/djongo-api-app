@@ -1,4 +1,5 @@
 from django.db import models
+from djongo import models
 from phonenumber_field.modelfields import PhoneNumberField
 import datetime
 
@@ -16,6 +17,8 @@ ESTADOS = [
 
 
 class Operacion(models.Model):
+    _id = models.ObjectIdField()
+    id = models.PositiveIntegerField(default=0, blank=False)
     id_tipo_operacion = models.CharField(choices=[("terceros", "terceros"),
                                                   ("interna", "interna"),
                                                   ("producto", "producto")],
