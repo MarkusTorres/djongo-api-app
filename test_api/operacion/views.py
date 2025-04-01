@@ -57,6 +57,16 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     serializer_class = OperacionSerializer
     pagination_class = OperacionesPagination
 
+    @auth_check()
+    def retrieve(self, request, *args, **kwargs):
+        pk = request.parser_context['kwargs']['pk']
+        queryset = Operacion.objects.filter(id__exact=pk)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
+        return Response(serializer.data)
+
     @action(detail=True, methods=['get', 'put', 'patch'], url_path='codigo')
     @auth_check()
     def codigo(self, request, pk=None):
