@@ -73,11 +73,11 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             pk = request.parser_context['kwargs']['pk']
             queryset = Operacion.objects.filter(id__exact=pk)
             queryset.delete()
-            serializer = OperacionSerializer(data=f"object successfully deleted", status=status.HTTP_200_OK)
-            return Response(serializer.data)
+            return Response(data="object successfully deleted")
+        except Operacion.DoesNotExist:
+            return Response(data="No object found in DB")
         except Operacion.MultipleObjectsReturned:
-            return Response(data="Multiple objects found in DB", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response(data="Multiple objects found in DB")
 
     @action(detail=True, methods=['get', 'put', 'patch'], url_path='codigo')
     @auth_check()
