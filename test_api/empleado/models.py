@@ -4,6 +4,7 @@ from djongo import models
 
 class Empleado(models.Model):
     _id = models.ObjectIdField()
+    id = models.PositiveIntegerField(default=0, blank=False)
     id_tipo = models.IntegerField(choices=[(1, 'Repartidor'), (2, 'Empleado'), (3, 'Analista'), (4, 'Maistro')])
     nombre = models.CharField(max_length=50, default='', blank=False)
     posicion = models.CharField(max_length=50, default='', blank=True)
