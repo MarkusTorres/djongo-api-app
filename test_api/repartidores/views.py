@@ -2,7 +2,7 @@ from repartidores.models import Repartidor
 from repartidores.serializers import RepartidorSerializer
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from tokens.views import auth_check
 from utils import base_utils
@@ -45,6 +45,19 @@ class RepartidorViewSet(base_utils.GenericViewSetAuth):
             return Response(data="No object found in DB")
         except Repartidor.MultipleObjectsReturned:
             return Response(data="Multiple objects found in DB")
+
+    @auth_check()
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        repartidor_obj = Repartidor.objects.filter(id__exact=data['id']).get()
+        repartidor_obj.nombre = base_utils.value_or_default('nombre', data, repartidor_obj.nombre)
+        repartidor_obj.sueldo = base_utils.value_or_default('sueldo', data, repartidor_obj.sueldo)
+        repartidor_obj.id_prestamo = base_utils.value_or_default('id_prestamo', data, repartidor_obj.id_prestamo)
+
+        repartidor_obj.save()
+        serialized_obj = Repartidor(repartidor_obj)
+        return Response(serialized_obj.data, status=status.HTTP_200_OK)
+
 
 @api_view
 def api_root(request, format=None):

@@ -2,7 +2,7 @@ from clientes.models import Cliente
 from clientes.serializers import ClienteSerializer
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from tokens.views import auth_check
 from utils import base_utils
@@ -57,6 +57,33 @@ class ClienteViewSet(base_utils.GenericViewSetAuth):
             return Response(data="No object found in DB")
         except Cliente.MultipleObjectsReturned:
             return Response(data="Multiple objects found in DB")
+
+    @auth_check()
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        cliente_obj = Cliente.objects.filter(id__exact=data['id']).get()
+
+        cliente_obj.id_tipo = base_utils.value_or_default('id_tipo', data, cliente_obj.id_tipo)
+        cliente_obj.nombre = base_utils.value_or_default('nombre', data, cliente_obj.nombre)
+        cliente_obj.calle = base_utils.value_or_default('calle', data, cliente_obj.calle)
+        cliente_obj.num_int = base_utils.value_or_default('num_int', data, cliente_obj.num_int)
+        cliente_obj.num_ext = base_utils.value_or_default('num_ext', data, cliente_obj.num_ext)
+        cliente_obj.colonia = base_utils.value_or_default('colonia', data, cliente_obj.colonia)
+        cliente_obj.cp = base_utils.value_or_default('cp', data, cliente_obj.cp)
+        cliente_obj.telefono = base_utils.value_or_default('telefono', data, cliente_obj.telefono)
+        cliente_obj.municipio = base_utils.value_or_default('municipio', data, cliente_obj.municipio)
+        cliente_obj.estado = base_utils.value_or_default('estado', data, cliente_obj.estado)
+        cliente_obj.entre_calles = base_utils.value_or_default('entre_calles', data, cliente_obj.entre_calles)
+        cliente_obj.desc_fachada = base_utils.value_or_default('desc_fachada', data, cliente_obj.desc_fachada)
+        cliente_obj.referencia = base_utils.value_or_default('referencia', data, cliente_obj.referencia)
+        cliente_obj.tarifa = base_utils.value_or_default('tarifa', data, cliente_obj.tarifa)
+        cliente_obj.nota = base_utils.value_or_default('nota', data, cliente_obj.nota)
+
+        cliente_obj.save()
+        serialized_obj = ClienteSerializer(cliente_obj)
+
+        return Response(serialized_obj.data, status=status.HTTP_200_OK)
+
 
 @api_view
 def api_root(request, format=None):

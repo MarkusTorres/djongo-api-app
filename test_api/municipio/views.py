@@ -2,7 +2,7 @@ from municipio.models import Municipio
 from municipio.serializers import MunicipioSerializer
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from tokens.views import auth_check
 from utils import base_utils
@@ -44,6 +44,17 @@ class MunicipioViewSet(base_utils.GenericViewSetAuth):
             return Response(data="No object found in DB")
         except Municipio.MultipleObjectsReturned:
             return Response(data="Multiple objects found in DB")
+
+    @auth_check()
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        municipio_obj = Municipio.objects.filter(id__exact=data['id']).get()
+        municipio_obj.nombre = base_utils.value_or_default('nombre', data, municipio_obj.nombre)
+        municipio_obj.precio = base_utils.value_or_default('precio', data, municipio_obj.precio)
+
+        municipio_obj.save()
+        serialized_obj = MunicipioSerializer(municipio_obj)
+        return Response(serialized_obj.data, status=status.HTTP_200_OK)
 
 
 @api_view

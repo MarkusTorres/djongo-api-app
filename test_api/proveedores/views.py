@@ -2,7 +2,7 @@ from proveedores.models import Proveedor
 from proveedores.serializers import ProveedorSerializer
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from tokens.views import auth_check
 from utils import base_utils
@@ -43,6 +43,18 @@ class ProveedorViewSet(base_utils.GenericViewSetAuth):
             return Response(data="No object found in DB")
         except Proveedor.MultipleObjectsReturned:
             return Response(data="Multiple objects found in DB")
+
+    @auth_check()
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        proveedor_obj = Proveedor.objects.filter(id__exact=data['id']).get()
+        proveedor_obj.nombre = base_utils.value_or_default('nombre', data, proveedor_obj.nombre)
+        proveedor_obj.tarifa = base_utils.value_or_default('tarifa', data, proveedor_obj.tarifa)
+
+        proveedor_obj.save()
+        serialized_obj = ProveedorSerializer(proveedor_obj)
+        return Response(serialized_obj.data, status=status.HTTP_200_OK)
+
 
 @api_view
 def api_root(request, format=None):
