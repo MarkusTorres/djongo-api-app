@@ -24,6 +24,28 @@ class RepartidorViewSet(base_utils.GenericViewSetAuth):
         serializer = RepartidorSerializer(new_item)
         return Response(serializer.data)
 
+    @auth_check()
+    def retrieve(self, request, *args, **kwargs):
+        pk = request.parser_context['kwargs']['pk']
+        queryset = Repartidor.objects.filter(id__exact=pk)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = RepartidorSerializer(queryset, context=serializer_context, many=True)
+        return Response(serializer.data)
+
+    @auth_check()
+    def destroy(self, request, *args, **kwargs):
+        try:
+            pk = request.parser_context['kwargs']['pk']
+            queryset = Repartidor.objects.filter(id__exact=pk)
+            queryset.delete()
+            return Response(data="object successfully deleted")
+        except Repartidor.DoesNotExist:
+            return Response(data="No object found in DB")
+        except Repartidor.MultipleObjectsReturned:
+            return Response(data="Multiple objects found in DB")
+
 @api_view
 def api_root(request, format=None):
     return Response({

@@ -50,8 +50,8 @@ class PrestamosViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    def destroy(self, request, *args, **kwargs):
-        raise Http404
+    # def destroy(self, request, *args, **kwargs):
+    #     raise Http404
 
     @staticmethod
     def create_abono_str(abono_cantidad):
@@ -97,4 +97,24 @@ class PrestamosViewSet(viewsets.ModelViewSet):
         except ObjectDoesNotExist:
             return Response(data=f'id {target_id} not found', status=status.HTTP_400_BAD_REQUEST)
 
-    # retrieve operation can be default behaviour
+    @auth_check()
+    def retrieve(self, request, *args, **kwargs):
+        pk = request.parser_context['kwargs']['pk']
+        queryset = Prestamo.objects.filter(id__exact=pk)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = PrestamoSerializer(queryset, context=serializer_context, many=True)
+        return Response(serializer.data)
+
+    @auth_check()
+    def destroy(self, request, *args, **kwargs):
+        try:
+            pk = request.parser_context['kwargs']['pk']
+            queryset = Prestamo.objects.filter(id__exact=pk)
+            queryset.delete()
+            return Response(data="object successfully deleted")
+        except Prestamo.DoesNotExist:
+            return Response(data="No object found in DB")
+        except Prestamo.MultipleObjectsReturned:
+            return Response(data="Multiple objects found in DB")

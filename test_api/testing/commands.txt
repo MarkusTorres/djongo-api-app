@@ -4,4 +4,12 @@ http GET http://127.0.0.1:8000/operacion/ token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX
 
 http GET http://127.0.0.1:8000/auth/log_in/ user:Juanito pass:1234
 
-http -j POST http://127.0.0.1:8000/operacion-bulk/ < ./bulk-add.json token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiSnVhbml0byJ9.dc5lI1vpdXlbtkFn0TFYwQIF8vz-s4H9kyN3cPOVDSU
+http -j POST http://127.0.0.1:8000/operacion-bulk/ < ./bulk-add.json token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTIzNDU2NzgifQ.Lzu-HIFo-xE7bg3-vOgPF5zgRJoCCtII1zfXRHYOWnc
+
+http -j POST http://127.0.0.1:8000/municipios/ < ./municipio.json token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTIzNDU2NzgifQ.Lzu-HIFo-xE7bg3-vOgPF5zgRJoCCtII1zfXRHYOWnc
+
+https GET https://walrus-app-ja4xp.ondigitalocean.app/operacion/42/ token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMzMxNDc2Njc3MCJ9.r2OlNqIyKbB2ljIBpxh_dbYACHlZHq9NnJPlhH5R2II
+https DELETE https://walrus-app-ja4xp.ondigitalocean.app/operacion/99/ token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMzMxNDc2Njc3MCJ9.r2OlNqIyKbB2ljIBpxh_dbYACHlZHq9NnJPlhH5R2II
+
+
+http GET http://127.0.0.1:8000/operacion/42/ token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMzMxNDc2Njc3MCJ9.r2OlNqIyKbB2ljIBpxh_dbYACHlZHq9NnJPlhH5R2II
