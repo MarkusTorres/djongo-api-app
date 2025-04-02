@@ -11,7 +11,7 @@ class Prestamo(models.Model):
     remanente = models.PositiveIntegerField(blank=False)
     fecha = models.DateField(default=datetime.date.today)
     liquidado = models.IntegerField(default=0)
-    historial = models.JSONField(blank=True, default="[]")
+    historial = models.JSONField(blank=True, default=[])
 
     class Meta:
         ordering = ["id_empleado"]

@@ -63,9 +63,9 @@ class PrestamosViewSet(viewsets.ModelViewSet):
         entries = json.loads(json_list)
         new_entry = json.loads(json_object)
         entries.append(new_entry)
-        new_history = json.dumps(entries)
+        # new_history = json.dumps(entries)
 
-        return new_history
+        return entries
 
     def update(self, request, *args, **kwargs):
         data = request.data

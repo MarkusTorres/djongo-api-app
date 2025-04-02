@@ -36,7 +36,7 @@ class Operacion(models.Model):
     nombre_referencia = models.CharField(max_length=90, blank=True)
     numero_referencia = PhoneNumberField(blank=True)
     repartidor = models.PositiveIntegerField(blank=True, default=0)
-    historial = models.JSONField(blank=True)
+    historial = models.JSONField(blank=True, default=[])
     # img = models.ImageField()
     peso = models.PositiveIntegerField(blank=True, default=0)
     largo = models.PositiveIntegerField(blank=True, default=0)
@@ -46,7 +46,7 @@ class Operacion(models.Model):
     devoluciones = models.PositiveIntegerField(blank=True, default=0)
     entregas = models.PositiveIntegerField(blank=True, default=0)
 
-    inventario_relacion = models.JSONField(blank=True)
+    inventario_relacion = models.JSONField(blank=True, default=[])
     codigo_postal = models.PositiveIntegerField(blank=False)
     imagen = models.TextField(blank=True)
     imagen_opcional = models.TextField(blank=True)
