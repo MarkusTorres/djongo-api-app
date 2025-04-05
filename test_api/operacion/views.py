@@ -18,6 +18,8 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 import json
 from tokens.views import _header_exists, auth_check
+import datetime
+from django.db.models import Sum
 
 
 CREADA = 'creada'
@@ -146,17 +148,23 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     def filtro(self, request, pk=None):
         try:
             data = request.data
+
+            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d')
+            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d')
+
             queries_list = [
-                Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']),
-                Operacion.objects.filter(codigo=data['codigo']),
-                Operacion.objects.filter(status=data['status']),
-                Operacion.objects.filter(repartidor=data['repartidor'])
+                Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None,
+                Operacion.objects.filter(codigo=data['codigo']) if data['codigo'] else None,
+                Operacion.objects.filter(status=data['status']) if data['status'] else None,
+                Operacion.objects.filter(repartidor=data['repartidor']) if data['repartidor'] else None,
+                Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
             ]
             queryset = Operacion.objects.all()
+        #     TODO: check codigo abc2
+        # queryset.aggregate(sum_precio=Sum('precio'))
         except ObjectDoesNotExist:
             return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
         # breakpoint()
-
         for query in queries_list:
             if query:
                 queryset = queryset & query
