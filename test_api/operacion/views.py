@@ -179,7 +179,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
-        if data['id_tipo_operacion'] == 'producto' and data['inventario_relacion'] == '':
+        if data['id_tipo_operacion'] == 'producto' and data['inventario_relacion'] == []:
             raise ValidationError(detail="Operacion tipo producto debe especificar inventario", code=500)
 
         new_operacion = insert_operacion(data, Operacion)
@@ -188,9 +188,9 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
     @auth_check()
     def update(self, request, *args, **kwargs):
-        id_obj = kwargs['pk']
+        # id_obj = kwargs['pk']
         data = request.data
-        data['id'] = id_obj
+        # data['id'] = id_obj
         results = bulk_update(data, Operacion)
         return Response(results, status=status.HTTP_201_CREATED)
 
