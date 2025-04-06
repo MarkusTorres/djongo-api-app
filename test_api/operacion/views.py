@@ -149,8 +149,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         try:
             data = request.data
 
-            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d')
-            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d')
+            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if data['fecha1'] else None
+            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d') if data['fecha2'] else None
 
             queries_list = [
                 Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None,
