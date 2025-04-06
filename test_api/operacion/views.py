@@ -35,7 +35,7 @@ ASIGNADA = 'asignada'
 flujo_operacion = {
     CREADA: [AGENDADA],
     AGENDADA: [EN_RUTA, CANCELADA, ENTREGADA],
-    ASIGNADA: AGENDADA,
+    ASIGNADA: [EN_RUTA, CANCELADA, ENTREGADA],
     EN_RUTA: [EFECTIVA, TRANSFERENCIA, REAGENDADA, CANCELADA],
     EFECTIVA: [REAGENDADA, CANCELADA],
     TRANSFERENCIA: [REAGENDADA, CANCELADA, ENTREGADA],
@@ -200,14 +200,19 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             if query:
                 queryset = queryset & query
 
-        resp = {'sum_precio': queryset.aggregate(sum_precio=Sum('precio'))}
+        resp = {
+            'sum_precio': queryset.aggregate(sum_precio=Sum('precio')),
+            'sum_tarifa': queryset.aggregate(sum_precio=Sum('tarifa'))
+        }
+
+        final = json.dumps(resp)
 
         serializer_context = {
             'request': request,
         }
         # serializer = OperacionSerializer(resp, context=serializer_context, many=True)
 
-        return Response(resp)
+        return Response(final)
 
     @auth_check()
     def create(self, request, *args, **kwargs):
