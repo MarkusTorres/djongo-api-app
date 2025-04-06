@@ -176,6 +176,38 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
         return Response(serializer.data)
 
+    @action(detail=False, methods=['post'])
+    @auth_check()
+    def sum_operaciones(self, request, pk=None):
+        try:
+            data = request.data
+
+            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d')
+            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d')
+
+            queries_list = [
+                Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None,
+                Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
+            ]
+            queryset = Operacion.objects.all()
+        #     TODO: check codigo abc2
+        # queryset.aggregate(sum_precio=Sum('precio'))
+        except ObjectDoesNotExist:
+            return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
+        # breakpoint()
+        for query in queries_list:
+            if query:
+                queryset = queryset & query
+
+        resp = {'sum_precio': queryset.aggregate(sum_precio=Sum('precio'))}
+
+        serializer_context = {
+            'request': request,
+        }
+        # serializer = OperacionSerializer(resp, context=serializer_context, many=True)
+
+        return Response(resp)
+
     @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -287,10 +319,6 @@ def bulk_update(data, model):
     operacion_obj.municipio_nombre = value_or_default('municipio_nombre', data, operacion_obj.municipio_nombre)
     operacion_obj.finalizada = value_or_default('finalizada', data, operacion_obj.finalizada)
     operacion_obj.pagado = value_or_default('pagado', data, operacion_obj.pagado)
-    # operacion_obj.tarifa = operacion_obj.tarifa[0]
-    # operacion_obj.precio = operacion_obj.precio[0]
-    operacion_obj.fecha_inicio = str(operacion_obj.fecha_inicio)
-    operacion_obj.fecha_final = str(operacion_obj.fecha_final)
     operacion_obj.save()
 
     serializer_class = OperacionSerializer(operacion_obj)
