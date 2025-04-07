@@ -19,7 +19,7 @@ from rest_framework.pagination import PageNumberPagination
 import json
 from tokens.views import _header_exists, auth_check
 import datetime
-from django.db.models import Sum
+from django.db.models import Sum, Count
 
 
 CREADA = 'creada'
@@ -191,28 +191,28 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                 Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
             ]
             queryset = Operacion.objects.all()
-        #     TODO: check codigo abc2
-        # queryset.aggregate(sum_precio=Sum('precio'))
         except ObjectDoesNotExist:
             return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
-        # breakpoint()
         for query in queries_list:
             if query:
                 queryset = queryset & query
 
-        resp = {
-            'sum_precio': queryset.aggregate(sum_precio=Sum('precio')),
-            'sum_tarifa': queryset.aggregate(sum_precio=Sum('tarifa'))
-        }
-
-        final = json.dumps(resp)
-
-        serializer_context = {
-            'request': request,
-        }
-        # serializer = OperacionSerializer(resp, context=serializer_context, many=True)
-
-        return Response(final)
+        resp = [
+            {'total': queryset.aggregate(sum_precio=Sum('precio'))},
+            {
+                'status': [
+                    queryset.filter(status=CREADA).aggregate(creada=Sum('precio')),
+                    queryset.filter(status=AGENDADA).aggregate(agendada=Sum('precio')),
+                    queryset.filter(status=ASIGNADA).aggregate(asignada=Sum('precio')),
+                    queryset.filter(status=EN_RUTA).aggregate(en_ruta=Sum('precio')),
+                    queryset.filter(status=EFECTIVA).aggregate(efectiva=Sum('precio')),
+                    queryset.filter(status=TRANSFERENCIA).aggregate(transferencia=Sum('precio')),
+                    queryset.filter(status=CANCELADA).aggregate(cancelada=Sum('precio')),
+                    queryset.filter(status=ENTREGADA).aggregate(entregada=Sum('precio'))
+                ]
+            }
+        ]
+        return Response(resp)
 
     @auth_check()
     def create(self, request, *args, **kwargs):
