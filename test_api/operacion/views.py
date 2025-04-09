@@ -55,6 +55,29 @@ class OperacionesPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
 
 
+def add_queries(all_data, status_filtro: str, filtro_fecha, filtro_operacion):
+    queryset = all_data
+    try:
+        queries_list = [
+            Operacion.objects.filter(status=status_filtro),
+            filtro_operacion,
+            filtro_fecha
+        ]
+
+        for query in queries_list:
+            if query:
+                queryset = queryset & query
+
+        if not all(queries_list):
+            return 0
+            # return Response(data=f'Query did not return values', status=status.HTTP_400_BAD_REQUEST)
+
+        return len(queryset)
+    except ObjectDoesNotExist:
+        return 0
+        # return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
+
+
 class OperacionViewSet(base_utils.GenericViewSetAuth):
     queryset = Operacion.objects.all()
     serializer_class = OperacionSerializer
@@ -180,35 +203,26 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     @action(detail=False, methods=['post'])
     @auth_check()
     def sum_operaciones(self, request, pk=None):
-        try:
-            data = request.data
-
-            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d')
-            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d')
-
-            queries_list = [
-                Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None,
-                Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
-            ]
-            queryset = Operacion.objects.all()
-        except ObjectDoesNotExist:
-            return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
-        for query in queries_list:
-            if query:
-                queryset = queryset & query
+        data = request.data
+        fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d')
+        fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d')
+        queryset = Operacion.objects.all()
+        filtro_fecha = Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
+        filtro_operacion = Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None
 
         resp = [
-            {'total': queryset.aggregate(sum_precio=Sum('precio'))},
+            {'total': (queryset & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('precio'))},
+            {'count_precio': (queryset & filtro_operacion & filtro_fecha).count()},
             {
                 'status': [
-                    queryset.filter(status=CREADA).aggregate(creada=Sum('precio')),
-                    queryset.filter(status=AGENDADA).aggregate(agendada=Sum('precio')),
-                    queryset.filter(status=ASIGNADA).aggregate(asignada=Sum('precio')),
-                    queryset.filter(status=EN_RUTA).aggregate(en_ruta=Sum('precio')),
-                    queryset.filter(status=EFECTIVA).aggregate(efectiva=Sum('precio')),
-                    queryset.filter(status=TRANSFERENCIA).aggregate(transferencia=Sum('precio')),
-                    queryset.filter(status=CANCELADA).aggregate(cancelada=Sum('precio')),
-                    queryset.filter(status=ENTREGADA).aggregate(entregada=Sum('precio'))
+                    {'creada': add_queries(queryset, 'creada', filtro_fecha, filtro_operacion)},
+                    {'agendada': add_queries(queryset, 'agendada', filtro_fecha, filtro_operacion)},
+                    {'ruta': add_queries(queryset, 'en ruta', filtro_fecha, filtro_operacion)},
+                    {'cancelada': add_queries(queryset, 'cancelada', filtro_fecha, filtro_operacion)},
+                    {'efectiva': add_queries(queryset, 'efectiva', filtro_fecha, filtro_operacion)},
+                    {'transferencia': add_queries(queryset, 'transferencia', filtro_fecha, filtro_operacion)},
+                    {'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion)},
+                    {'entregada': add_queries(queryset, 'entregada', filtro_fecha, filtro_operacion)}
                 ]
             }
         ]
