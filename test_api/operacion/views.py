@@ -19,8 +19,7 @@ from rest_framework.pagination import PageNumberPagination
 import json
 from tokens.views import _header_exists, auth_check
 import datetime
-from django.db.models import Sum, Count
-
+from django.db.models import Sum, Count, QuerySet
 
 CREADA = 'creada'
 AGENDADA = 'agendada'
@@ -55,11 +54,14 @@ class OperacionesPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
 
 
-def add_queries(all_data, status_filtro: str, filtro_fecha, filtro_operacion):
+# TODO: when adding operaciones, check if the codigo is already there
+
+def add_queries(all_data, status_filtro: str, filtro_fecha, filtro_operacion, filtro_repartidor):
     queryset = all_data
     try:
         queries_list = [
             Operacion.objects.filter(status=status_filtro),
+            filtro_repartidor,
             filtro_operacion,
             filtro_fecha
         ]
@@ -158,6 +160,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     @action(detail=True, methods=['get'])
     @auth_check()
     def repartidor(self, request, pk=None):
+        # TODO change to post and be able to filter by dates
         queryset = Operacion.objects.filter(repartidor__exact=pk)
 
         serializer_context = {
@@ -207,23 +210,30 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d')
         fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d')
         queryset = Operacion.objects.all()
+        filtro_repartidor = Operacion.objects.filter(repartidor=data['repartidor']) if data['repartidor'] else queryset
         filtro_fecha = Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
         filtro_operacion = Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None
 
+        # terceros tiene que sumar por proveedor, total ($$$) y count #
         resp = [
-            {'total': (queryset & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('precio'))},
-            {'count_precio': (queryset & filtro_operacion & filtro_fecha).count()},
             {
-                'status': [
-                    {'creada': add_queries(queryset, 'creada', filtro_fecha, filtro_operacion)},
-                    {'agendada': add_queries(queryset, 'agendada', filtro_fecha, filtro_operacion)},
-                    {'ruta': add_queries(queryset, 'en ruta', filtro_fecha, filtro_operacion)},
-                    {'cancelada': add_queries(queryset, 'cancelada', filtro_fecha, filtro_operacion)},
-                    {'efectiva': add_queries(queryset, 'efectiva', filtro_fecha, filtro_operacion)},
-                    {'transferencia': add_queries(queryset, 'transferencia', filtro_fecha, filtro_operacion)},
-                    {'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion)},
-                    {'entregada': add_queries(queryset, 'entregada', filtro_fecha, filtro_operacion)}
-                ]
+                'total': {
+                    'precio': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('precio'))['sum_precio'],
+                    'count_precio': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).count()
+                }
+            },
+            {
+                'status': {
+                    'creada': add_queries(queryset, 'creada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'agendada': add_queries(queryset, 'agendada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'asignada': add_queries(queryset, 'asignada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'ruta': add_queries(queryset, 'en ruta', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'cancelada': add_queries(queryset, 'cancelada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'efectiva': add_queries(queryset, 'efectiva', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'transferencia': add_queries(queryset, 'transferencia', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'entregada': add_queries(queryset, 'entregada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                }
             }
         ]
         return Response(resp)
