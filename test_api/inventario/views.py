@@ -2,7 +2,7 @@ from inventario.models import Inventario
 from inventario.serializers import InventarioSerializer
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from tokens.views import auth_check
 from utils import base_utils
@@ -62,6 +62,20 @@ class InventarioViewSet(base_utils.GenericViewSetAuth):
             return Response(data="No object found in DB")
         except Inventario.MultipleObjectsReturned:
             return Response(data="Multiple objects found in DB")
+
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        id_obj = kwargs['pk']
+        inventario_obj = Inventario.objects.get(id=id_obj)
+
+        inventario_obj.concepto = base_utils.value_or_default('concepto', data, inventario_obj.concepto)
+        inventario_obj.cantidad = base_utils.value_or_default('cantidad', data, inventario_obj.cantidad)
+        inventario_obj.comentario = base_utils.value_or_default('comentario', data, inventario_obj.comentario)
+
+        inventario_obj.save()
+        serialized_obj = InventarioSerializer(inventario_obj)
+
+        return Response(serialized_obj.data, status=status.HTTP_200_OK)
 
 
 @api_view
