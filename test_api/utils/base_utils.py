@@ -1,5 +1,8 @@
-from rest_framework import viewsets
+from functools import wraps
 from tokens.views import auth_check
+from rest_framework import viewsets
+from rest_framework.response import Response
+from django.db.models import QuerySet
 from django.db.models import Max
 
 
@@ -38,3 +41,19 @@ def get_model_new_id(model):
     max_id = 0 if max_id is None else max_id
 
     return max_id + 1
+
+
+def paginate(func):
+    @wraps(func)
+    def inner(self, *args, **kwargs):
+        queryset = func(self, *args, **kwargs)
+        assert isinstance(queryset, (list, QuerySet)), "apply_pagination expects a List or a QuerySet"
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    return inner

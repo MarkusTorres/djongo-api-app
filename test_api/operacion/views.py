@@ -178,6 +178,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         except Operacion.DoesNotExist:
             return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @base_utils.paginate
     @action(detail=False, methods=['post'])
     @auth_check()
     def filtro(self, request, pk=None):
@@ -205,9 +206,10 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         serializer_context = {
             'request': request,
         }
-        serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
-
-        return Response(serializer.data)
+        # serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
+        #
+        # return Response(serializer.data)
+        return queryset
 
     @action(detail=False, methods=['post'])
     @auth_check()
