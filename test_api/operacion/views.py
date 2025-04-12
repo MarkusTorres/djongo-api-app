@@ -157,21 +157,29 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         except ObjectDoesNotExist:
             return Response(data=f'id {pk} not found', status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=False, methods=['post'])
     @auth_check()
     def repartidor(self, request, pk=None):
-        # TODO change to post and be able to filter by dates
-        queryset = Operacion.objects.filter(repartidor__exact=pk)
+        data = request.data
+        try:
+            queryset = Operacion.objects.filter(repartidor__exact=data['repartidor'])
+            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if data['fecha1'] else None
+            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d') if data['fecha2'] else None
 
-        serializer_context = {
-            'request': request,
-        }
-        serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
+            if fecha_1 and fecha_2:
+                queryset = queryset & Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2))
 
-        return Response(serializer.data)
+            serializer_context = {
+                'request': request,
+            }
+            serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
+
+            return Response(serializer.data)
+        except Operacion.DoesNotExist:
+            return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=['post'])
-    # @auth_check()
+    @auth_check()
     def filtro(self, request, pk=None):
         try:
             data = request.data
@@ -187,8 +195,6 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                 Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
             ]
             queryset = Operacion.objects.all()
-        #     TODO: check codigo abc2
-        # queryset.aggregate(sum_precio=Sum('precio'))
         except ObjectDoesNotExist:
             return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
         # breakpoint()
