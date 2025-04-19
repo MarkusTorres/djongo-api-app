@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 from django.http import Http404
 from operacion.models import Operacion
 from inventario.views import update_inventario
+from empleado.views import repartidor_info
 from operacion.models import Flujo
 from operacion.serializers import OperacionSerializer
 from operacion.serializers import FlujoSerializer
@@ -22,6 +23,7 @@ from tokens.views import _header_exists, auth_check
 import datetime
 from django.db.models import Sum, Count, QuerySet
 from django.db.models import Q
+from collections import OrderedDict
 
 CREADA = 'creada'
 AGENDADA = 'agendada'
@@ -217,6 +219,56 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         #
         # return Response(serializer.data)
         return queryset
+
+    @action(detail=False, methods=['post'])
+    @auth_check()
+    def totales_repartidor(self, request, pk=None):
+        data = request.data
+        try:
+            q_repartidor = Q(repartidor__exact=data['repartidor'])
+            q_finalizada = Q(finalizada__in=[False])
+            q_producto = Q(id_tipo_operacion="producto")
+            q_terceros = Q(id_tipo_operacion="terceros")
+            q_interna = Q(id_tipo_operacion="interna")
+            q_creada = Q(status='creada')
+            q_agendada = Q(status='agendada')
+            q_asignada = Q(status='asignada')
+            q_ruta = Q(status='en ruta')
+            q_cancelada = Q(status='cancelada')
+            q_efectiva = Q(status='efectiva')
+            q_transferencia = Q(status='transferencia')
+            q_reagendada = Q(status='reagendada')
+
+            queryset = Operacion.objects.filter(q_repartidor & q_finalizada)
+            nombre = repartidor_info(data['repartidor'])
+            if not nombre:
+                return Response('no repartidor found')
+
+            resp = [
+                {
+                    'repartidor': nombre,
+                    'total': queryset.count(),
+                    'tipos': {
+                        'producto': queryset.filter(q_producto).count(),
+                        'terceros': queryset.filter(q_terceros).count(),
+                        'interna': queryset.filter(q_interna).count()
+                    },
+                    'statuses': {
+                        'creada': queryset.filter(q_creada).count(),
+                        'agendada': queryset.filter(q_agendada).count(),
+                        'asignada': queryset.filter(q_asignada).count(),
+                        'ruta': queryset.filter(q_ruta).count(),
+                        'cancelada': queryset.filter(q_cancelada).count(),
+                        'efectiva': queryset.filter(q_efectiva).count(),
+                        'transferencia': queryset.filter(q_transferencia).count(),
+                        'reagendada': queryset.filter(q_reagendada).count()
+                    }
+                }
+            ]
+
+            return Response(resp)
+        except Operacion.DoesNotExist:
+            return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     '''
     - /codigos/ un json por post con chingos de codigos

@@ -9,6 +9,14 @@ from tokens.views import auth_check
 from utils import base_utils
 
 
+def repartidor_info(id):
+    try:
+        result = Empleado.objects.get(id__exact=id)
+        return result.nombre
+    except Empleado.DoesNotExist:
+        return None
+
+
 class EmpleadoViewSet(base_utils.GenericViewSetAuth):
     queryset = Empleado.objects.all()
     serializer_class = EmpleadoSerializer
