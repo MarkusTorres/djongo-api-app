@@ -1,3 +1,4 @@
+import django
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
@@ -20,6 +21,7 @@ import json
 from tokens.views import _header_exists, auth_check
 import datetime
 from django.db.models import Sum, Count, QuerySet
+from django.db.models import Q
 
 CREADA = 'creada'
 AGENDADA = 'agendada'
@@ -161,18 +163,19 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     def repartidor(self, request, pk=None):
         data = request.data
         try:
-            queryset = Operacion.objects.filter(repartidor__exact=data['repartidor'])
-            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if data['fecha1'] else None
-            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d') if data['fecha2'] else None
+            q_repartidor = Q(repartidor__exact=data['repartidor'])
+            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if base_utils.value_or_default('fecha1', data, False) else None
+            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d') if base_utils.value_or_default('fecha2', data, False) else None
+            q_fecha = Q(fecha_inicio__range=(fecha_1, fecha_2))
+            finalizada = base_utils.value_or_default('finalizada', data, False)
+            q_finalizada = Q(finalizada__in=[finalizada])
 
-            if fecha_1 and fecha_2:
-                queryset = queryset & Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2))
+            queryset = Operacion.objects.filter(q_repartidor & q_finalizada & q_fecha)
 
             serializer_context = {
                 'request': request,
             }
             serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
-
             return Response(serializer.data)
         except Operacion.DoesNotExist:
             return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -186,9 +189,11 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
             fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if data['fecha1'] else None
             fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d') if data['fecha2'] else None
+            finalizada = base_utils.value_or_default('finalizada', data, False)
 
             queries_list = [
                 Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None,
+                Operacion.objects.filter(finalizada__in=[finalizada]),
                 Operacion.objects.filter(codigo=data['codigo']) if data['codigo'] else None,
                 Operacion.objects.filter(status=data['status']) if data['status'] else None,
                 Operacion.objects.filter(repartidor=data['repartidor']) if data['repartidor'] else None,
@@ -199,6 +204,9 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
         # breakpoint()
         for query in queries_list:
+            if query is not None and len(query) == 0:  # distinction for empty query object (nothing found)
+                queryset = []
+                break
             if query:
                 queryset = queryset & query
 
@@ -210,33 +218,33 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         # return Response(serializer.data)
         return queryset
 
-'''
-- /codigos/ un json por post con chingos de codigos
-- Agregar finalizado en endpoint repartidor & filtro
-
-/operaciones_repartidor/
-
-// Todo lo que no sea finalizado alv
-
-[
-	{
-		"repartidor": "Pedrito Sola",
-		"total:50,
-		"tipos": {
-			"producto": 2398,
-			"terceros": 423,
-			"interna": 62346,
-		},
-		"statuses":{
-			"creada": 20,
-			"en_proceso": 10,
-			"completada": 15,
-			"cancelada": 5
-		},
-		"finalizado": 50
-	}
-]
-'''
+    '''
+    - /codigos/ un json por post con chingos de codigos
+    - Agregar finalizado en endpoint repartidor & filtro
+    
+    /operaciones_repartidor/
+    
+    // Todo lo que no sea finalizado alv
+    
+    [
+        {
+            "repartidor": "Pedrito Sola",
+            "total:50,
+            "tipos": {
+                "producto": 2398,
+                "terceros": 423,
+                "interna": 62346,
+            },
+            "statuses":{
+                "creada": 20,
+                "en_proceso": 10,
+                "completada": 15,
+                "cancelada": 5
+            },
+            "finalizado": 50
+        }
+    ]
+        '''
 
     @action(detail=False, methods=['post'])
     @auth_check()
