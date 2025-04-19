@@ -28,17 +28,16 @@ CANCELADA = 'cancelada'
 EFECTIVA = 'efectiva'
 TRANSFERENCIA = 'transferencia'
 REAGENDADA = 'reagendada'
-ENTREGADA = 'entregada'
 ASIGNADA = 'asignada'
 
 flujo_operacion = {
     CREADA: [AGENDADA],
-    AGENDADA: [EN_RUTA, CANCELADA, ENTREGADA],
-    ASIGNADA: [EN_RUTA, CANCELADA, ENTREGADA],
+    AGENDADA: [EN_RUTA, CANCELADA],
+    ASIGNADA: [EN_RUTA, CANCELADA],
     EN_RUTA: [EFECTIVA, TRANSFERENCIA, REAGENDADA, CANCELADA],
     EFECTIVA: [REAGENDADA, CANCELADA],
-    TRANSFERENCIA: [REAGENDADA, CANCELADA, ENTREGADA],
-    CANCELADA: [ENTREGADA]
+    TRANSFERENCIA: [REAGENDADA, CANCELADA],
+    CANCELADA: [ASIGNADA]
 }
 
 #
@@ -211,6 +210,34 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         # return Response(serializer.data)
         return queryset
 
+'''
+- /codigos/ un json por post con chingos de codigos
+- Agregar finalizado en endpoint repartidor & filtro
+
+/operaciones_repartidor/
+
+// Todo lo que no sea finalizado alv
+
+[
+	{
+		"repartidor": "Pedrito Sola",
+		"total:50,
+		"tipos": {
+			"producto": 2398,
+			"terceros": 423,
+			"interna": 62346,
+		},
+		"statuses":{
+			"creada": 20,
+			"en_proceso": 10,
+			"completada": 15,
+			"cancelada": 5
+		},
+		"finalizado": 50
+	}
+]
+'''
+
     @action(detail=False, methods=['post'])
     @auth_check()
     def sum_operaciones(self, request, pk=None):
@@ -239,8 +266,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                     'cancelada': add_queries(queryset, 'cancelada', filtro_fecha, filtro_operacion, filtro_repartidor),
                     'efectiva': add_queries(queryset, 'efectiva', filtro_fecha, filtro_operacion, filtro_repartidor),
                     'transferencia': add_queries(queryset, 'transferencia', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'entregada': add_queries(queryset, 'entregada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion, filtro_repartidor)
                 }
             }
         ]
