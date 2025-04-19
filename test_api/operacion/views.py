@@ -162,6 +162,22 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
     @action(detail=False, methods=['post'])
     @auth_check()
+    def codigos(self, request, pk=None):
+        data = request.data
+        # try:
+        #
+        # except Operacion.DoesNotExist:
+        #     return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        queryset = Operacion.objects.filter(codigo__in=data['codigos'])
+
+        serializer_context = {
+            'request': request,
+        }
+        serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    @auth_check()
     def repartidor(self, request, pk=None):
         data = request.data
         try:
@@ -269,34 +285,6 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             return Response(resp)
         except Operacion.DoesNotExist:
             return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    '''
-    - /codigos/ un json por post con chingos de codigos
-    - Agregar finalizado en endpoint repartidor & filtro
-    
-    /operaciones_repartidor/
-    
-    // Todo lo que no sea finalizado alv
-    
-    [
-        {
-            "repartidor": "Pedrito Sola",
-            "total:50,
-            "tipos": {
-                "producto": 2398,
-                "terceros": 423,
-                "interna": 62346,
-            },
-            "statuses":{
-                "creada": 20,
-                "en_proceso": 10,
-                "completada": 15,
-                "cancelada": 5
-            },
-            "finalizado": 50
-        }
-    ]
-        '''
 
     @action(detail=False, methods=['post'])
     @auth_check()
