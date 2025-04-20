@@ -7,7 +7,9 @@ class Municipio(models.Model):
     _id = models.ObjectIdField()
     id = models.PositiveIntegerField(default=0, blank=False)
     nombre = models.CharField(max_length=50, default='', blank=False)
-    precio = models.DecimalField(max_length=10, decimal_places=2, max_digits=12)
+    precio = models.FloatField(blank=False, default=1)
+    tarifa_internas = models.FloatField(blank=False, default=1)
+    tarifa_producto = models.FloatField(blank=False, default=1)
 
     class Meta:
         ordering = ["nombre"]

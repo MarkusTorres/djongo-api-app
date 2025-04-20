@@ -19,7 +19,7 @@ class Cliente(models.Model):
     entre_calles = models.CharField(max_length=90, blank=True)
     desc_fachada = models.TextField()
     referencia = models.TextField()
-    tarifa = models.DecimalField(max_length=6, decimal_places=2, max_digits=6)
+    tarifa = models.FloatField(blank=False, default=1)
     nota = models.TextField()
 
     class Meta:
