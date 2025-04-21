@@ -216,6 +216,10 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         try:
             data = request.data
 
+            if data['codigo'] is not None:
+                resp = Operacion.objects.filter(codigo=data['codigo'])
+                return resp
+
             fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if data['fecha1'] else None
             fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d') if data['fecha2'] else None
             finalizada = base_utils.value_or_default('finalizada', data, False)
@@ -223,7 +227,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             queries_list = [
                 Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None,
                 Operacion.objects.filter(finalizada__in=[finalizada]),
-                Operacion.objects.filter(codigo=data['codigo']) if data['codigo'] else None,
+                # Operacion.objects.filter(codigo=data['codigo']) if data['codigo'] else None,
                 Operacion.objects.filter(status=data['status']) if data['status'] else None,
                 Operacion.objects.filter(repartidor=data['repartidor']) if data['repartidor'] else None,
                 Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
