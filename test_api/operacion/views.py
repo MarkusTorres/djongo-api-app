@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from django.http import Http404
 from operacion.models import Operacion
 from inventario.views import update_inventario
-from empleado.views import repartidor_info
+from empleado.views import repartidor_info, get_repartidores
 from operacion.models import Flujo
 from operacion.serializers import OperacionSerializer
 from operacion.serializers import FlujoSerializer
@@ -81,6 +81,17 @@ def add_queries(all_data, status_filtro: str, filtro_fecha, filtro_operacion, fi
     except ObjectDoesNotExist:
         return 0
         # return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
+
+
+def get_sum_object(query_result, field):
+    sumatoria = {}
+    for element in query_result:
+        if element['repartidor'] is not None:
+            if element['repartidor'] not in sumatoria.keys():
+                sumatoria[element['repartidor']] = {}
+                sumatoria[element['repartidor']][element[field]] = element['db_count']
+            sumatoria[element['repartidor']][element[field]] = element['db_count']
+    return sumatoria
 
 
 class OperacionViewSet(base_utils.GenericViewSetAuth):
@@ -285,6 +296,42 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             return Response(resp)
         except Operacion.DoesNotExist:
             return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['get'])
+    @auth_check()
+    def repartidores_global(self, request, pk=None):
+        resp = []
+        repartidores = get_repartidores()
+        group_status = Operacion.objects.values('repartidor', 'status').annotate(db_count=Count('status')).order_by()
+        group_tipo = Operacion.objects.values('repartidor', 'id_tipo_operacion').annotate(db_count=Count('status')).order_by()
+        status_counts = get_sum_object(group_status, 'status')
+        group_tipo = get_sum_object(group_tipo, 'id_tipo_operacion')
+
+        for repartidor in repartidores.keys():
+            item = {
+                'repartidor': repartidores[repartidor],
+                'tipos': {
+                    'producto': base_utils.value_or_default('producto', group_tipo[repartidor], 0),
+                    'terceros': base_utils.value_or_default('terceros', group_tipo[repartidor], 0),
+                    'interna': base_utils.value_or_default('interna', group_tipo[repartidor], 0)
+                },
+                'statuses': {
+                    'creada': base_utils.value_or_default('creada', status_counts[repartidor], 0),
+                    'agendada': base_utils.value_or_default('agendada', status_counts[repartidor], 0),
+                    'asignada': base_utils.value_or_default('asignada', status_counts[repartidor], 0),
+                    'ruta': base_utils.value_or_default('ruta', status_counts[repartidor], 0),
+                    'cancelada': base_utils.value_or_default('cancelada', status_counts[repartidor], 0),
+                    'efectiva': base_utils.value_or_default('efectiva', status_counts[repartidor], 0),
+                    'transferencia': base_utils.value_or_default('transferencia', status_counts[repartidor], 0),
+                    'reagendada': base_utils.value_or_default('reagendada', status_counts[repartidor], 0)
+                },
+                'total': base_utils.value_or_default('producto', group_tipo[repartidor], 0) +
+                         base_utils.value_or_default('terceros', group_tipo[repartidor], 0) +
+                         base_utils.value_or_default('interna', group_tipo[repartidor], 0)
+            }
+            resp.append(item)
+
+        return Response(resp)
 
     @action(detail=False, methods=['post'])
     @auth_check()

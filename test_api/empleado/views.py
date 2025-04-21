@@ -17,6 +17,11 @@ def repartidor_info(id):
         return None
 
 
+def get_repartidores():
+    queryset = Empleado.objects.filter(id_tipo=1)
+    return {empleado.id: empleado.nombre for empleado in queryset}
+
+
 class EmpleadoViewSet(base_utils.GenericViewSetAuth):
     queryset = Empleado.objects.all()
     serializer_class = EmpleadoSerializer
