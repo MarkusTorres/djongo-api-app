@@ -18,7 +18,9 @@ class MunicipioViewSet(base_utils.GenericViewSetAuth):
         new_item = Municipio.objects.create(
             id=max_id,
             nombre=data['nombre'],
-            precio=data['precio']
+            precio=data['precio'],
+            tarifa_internas=data['tarifa_internas'],
+            tarifa_producto=data['tarifa_producto']
         )
         serializer = MunicipioSerializer(new_item)
         return Response(serializer.data)
@@ -51,6 +53,8 @@ class MunicipioViewSet(base_utils.GenericViewSetAuth):
         municipio_obj = Municipio.objects.filter(id__exact=data['id']).get()
         municipio_obj.nombre = base_utils.value_or_default('nombre', data, municipio_obj.nombre)
         municipio_obj.precio = base_utils.value_or_default('precio', data, municipio_obj.precio)
+        municipio_obj.tarifa_internas = base_utils.value_or_default('tarifa_internas', data, municipio_obj.tarifa_internas)
+        municipio_obj.tarifa_producto = base_utils.value_or_default('tarifa_producto', data, municipio_obj.tarifa_producto)
 
         municipio_obj.save()
         serialized_obj = MunicipioSerializer(municipio_obj)
