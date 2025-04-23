@@ -442,10 +442,18 @@ def insert_operacion(data, model):
 def validate_obj_operacion(obj):
     valid = True
 
-    if obj.direccion_inicio == '' or obj.codigo_postal == '' or obj.cantidad == '' or obj.codigo == '':
+    if obj['direccion_inicio'] == '' or obj['codigo_postal'] == '' or obj['cantidad'] == '' or obj['codigo'] == '':
         valid = False
 
     return valid
+
+
+def check_duplicate_codigo(codigo):
+    try:
+        Operacion.objects.get(codigo=codigo)
+        return True
+    except Operacion.DoesNotExist:
+        return False
 
 
 def bulk_update(data, model):
@@ -501,18 +509,25 @@ class OperacionBulkViewSet(viewsets.ModelViewSet):
         # results = [insert_operacion(single_operacion, Operacion) for single_operacion in data]
         results = []
         for operacion_data in data:
-            result = create_obj_operacion(operacion_data, Operacion)
-            valid_obj = validate_obj_operacion(result)
+            if check_duplicate_codigo(operacion_data['codigo']):
+                return Response(f'Codigo {operacion_data["codigo"]} es un codigo que ya existe')
+            valid_obj = validate_obj_operacion(operacion_data)
             if not valid_obj:
-                return Response(f"La operacion {result.codigo} tiene datos incorrectos o con formato erroneo",
+                return Response(f"La operacion {operacion_data['codigo']} tiene datos incorrectos o con formato erroneo",
                                 status=status.HTTP_200_OK)
+            result = create_obj_operacion(operacion_data, Operacion)
 
-            results.append(result)
+            results.append(result.id)
 
-        operacion_list = Operacion.objects.bulk_create(results)
+        resp = {
+            'msg': f'{len(results)} operaciones fueron agregadas',
+            'ids': results
+        }
+        # operacion_list = Operacion.objects.bulk_create(results)
         # serializer = self.get_serialier(data=request.data, many=True)
-        headers = self.get_success_headers(operacion_list)
-        return Response(f'{len(operacion_list)} operaciones fueron agregadas', status=status.HTTP_201_CREATED, headers=headers)
+        # headers = self.get_success_headers(operacion_list)
+        # return Response(f'{len(operacion_list)} operaciones fueron agregadas', status=status.HTTP_201_CREATED, headers=headers)
+        return Response(resp, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
         raise Http404
