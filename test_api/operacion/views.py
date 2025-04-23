@@ -310,8 +310,10 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         group_tipo = Operacion.objects.values('repartidor', 'id_tipo_operacion').annotate(db_count=Count('status')).order_by()
         status_counts = get_sum_object(group_status, 'status')
         group_tipo = get_sum_object(group_tipo, 'id_tipo_operacion')
+        # set(A) - (set(A) - set(B))
+        valid_repartidores = set(repartidores.keys()) - (set(repartidores.keys()) - set(status_counts.keys()))
 
-        for repartidor in repartidores.keys():
+        for repartidor in valid_repartidores:
             item = {
                 'repartidor': repartidores[repartidor],
                 'tipos': {
