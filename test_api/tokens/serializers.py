@@ -6,4 +6,4 @@ class TokensSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Tokens
-        fields = ['id', 'user_id', 'token', 'created']
+        fields = ['id', 'user_id', 'user_type', 'token', 'created']

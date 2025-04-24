@@ -7,6 +7,7 @@ class Tokens(models.Model):
     _id = models.ObjectIdField()
     id = models.PositiveIntegerField(default=0, blank=False)
     user_id = models.CharField(max_length=50)
+    user_type = models.PositiveIntegerField(default=0, blank=False)
     token = models.CharField(max_length=50)
     created = models.DateField(auto_now_add=True)
 

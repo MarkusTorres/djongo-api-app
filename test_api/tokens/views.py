@@ -92,6 +92,7 @@ class AuthViewSet(viewsets.ModelViewSet):
         new_token = Tokens.objects.create(
             id=id,
             user_id=user_obj.id,
+            user_type=user_obj.id_tipo,
             token=user_encoded_token,
             created=dt.datetime.now().strftime('%Y-%m-%d')
         )
