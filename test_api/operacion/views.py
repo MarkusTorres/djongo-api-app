@@ -44,12 +44,6 @@ flujo_operacion = {
     CANCELADA: [ASIGNADA]
 }
 
-#
-# def check_if_field_exists(obj, field):
-#     if field in obj.__dict__.keys():
-#
-#
-
 
 class OperacionesPagination(PageNumberPagination):
     page_size = 20
@@ -257,88 +251,14 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def totales_repartidor(self, request, pk=None):
         data = request.data
-        try:
-            q_repartidor = Q(repartidor__exact=data['repartidor'])
-            q_finalizada = Q(finalizada__in=[False])
-            q_producto = Q(id_tipo_operacion="producto")
-            q_terceros = Q(id_tipo_operacion="terceros")
-            q_interna = Q(id_tipo_operacion="interna")
-            q_creada = Q(status='creada')
-            q_agendada = Q(status='agendada')
-            q_asignada = Q(status='asignada')
-            q_ruta = Q(status='en ruta')
-            q_cancelada = Q(status='cancelada')
-            q_efectiva = Q(status='efectiva')
-            q_transferencia = Q(status='transferencia')
-            q_reagendada = Q(status='reagendada')
+        resp = group_operaciones_report(data['repartidor'])
 
-            queryset = Operacion.objects.filter(q_repartidor & q_finalizada)
-            nombre = repartidor_info(data['repartidor'])
-            if not nombre:
-                return Response('no repartidor found')
-
-            resp = [
-                {
-                    'repartidor': nombre,
-                    'total': queryset.count(),
-                    'tipos': {
-                        'producto': queryset.filter(q_producto).count(),
-                        'terceros': queryset.filter(q_terceros).count(),
-                        'interna': queryset.filter(q_interna).count()
-                    },
-                    'statuses': {
-                        'creada': queryset.filter(q_creada).count(),
-                        'agendada': queryset.filter(q_agendada).count(),
-                        'asignada': queryset.filter(q_asignada).count(),
-                        'ruta': queryset.filter(q_ruta).count(),
-                        'cancelada': queryset.filter(q_cancelada).count(),
-                        'efectiva': queryset.filter(q_efectiva).count(),
-                        'transferencia': queryset.filter(q_transferencia).count(),
-                        'reagendada': queryset.filter(q_reagendada).count()
-                    }
-                }
-            ]
-
-            return Response(resp)
-        except Operacion.DoesNotExist:
-            return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(resp)
 
     @action(detail=False, methods=['get'])
     @auth_check()
     def repartidores_global(self, request, pk=None):
-        resp = []
-        repartidores = get_repartidores()
-        group_status = Operacion.objects.filter(finalizada__in=[False]).values('repartidor', 'status').annotate(db_count=Count('status')).order_by()
-        group_tipo = Operacion.objects.filter(finalizada__in=[False]).values('repartidor', 'id_tipo_operacion').annotate(db_count=Count('status')).order_by()
-        status_counts = get_sum_object(group_status, 'status')
-        group_tipo = get_sum_object(group_tipo, 'id_tipo_operacion')
-        # set(A) - (set(A) - set(B))
-        valid_repartidores = set(repartidores.keys()) - (set(repartidores.keys()) - set(status_counts.keys()))
-
-        for repartidor in valid_repartidores:
-            item = {
-                'repartidor': repartidores[repartidor],
-                'repartidor_id': repartidor,
-                'tipos': {
-                    'producto': base_utils.value_or_default('producto', group_tipo[repartidor], 0),
-                    'terceros': base_utils.value_or_default('terceros', group_tipo[repartidor], 0),
-                    'interna': base_utils.value_or_default('interna', group_tipo[repartidor], 0)
-                },
-                'statuses': {
-                    'creada': base_utils.value_or_default('creada', status_counts[repartidor], 0),
-                    'agendada': base_utils.value_or_default('agendada', status_counts[repartidor], 0),
-                    'asignada': base_utils.value_or_default('asignada', status_counts[repartidor], 0),
-                    'ruta': base_utils.value_or_default('ruta', status_counts[repartidor], 0),
-                    'cancelada': base_utils.value_or_default('cancelada', status_counts[repartidor], 0),
-                    'efectiva': base_utils.value_or_default('efectiva', status_counts[repartidor], 0),
-                    'transferencia': base_utils.value_or_default('transferencia', status_counts[repartidor], 0),
-                    'reagendada': base_utils.value_or_default('reagendada', status_counts[repartidor], 0)
-                },
-                'total': base_utils.value_or_default('producto', group_tipo[repartidor], 0) +
-                         base_utils.value_or_default('terceros', group_tipo[repartidor], 0) +
-                         base_utils.value_or_default('interna', group_tipo[repartidor], 0)
-            }
-            resp.append(item)
+        resp = group_operaciones_report()
 
         return Response(resp)
 
@@ -393,6 +313,52 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         # data['id'] = id_obj
         results = bulk_update(data, Operacion)
         return Response(results, status=status.HTTP_201_CREATED)
+
+
+def group_operaciones_report(repartidor_id=None):
+    resp = []
+    repartidores = get_repartidores() if repartidor_id is None else get_repartidores(repartidor_id)
+    group_status = Operacion.objects \
+        .filter(finalizada__in=[False]) \
+        .values('repartidor', 'status') \
+        .annotate(db_count=Count('status')) \
+        .order_by()
+    group_tipo = Operacion.objects\
+        .filter(finalizada__in=[False])\
+        .values('repartidor', 'id_tipo_operacion')\
+        .annotate(db_count=Count('status'))\
+        .order_by()
+    status_counts = get_sum_object(group_status, 'status')
+    group_tipo = get_sum_object(group_tipo, 'id_tipo_operacion')
+    # set(A) - (set(A) - set(B))
+    valid_repartidores = set(repartidores.keys()) - (set(repartidores.keys()) - set(status_counts.keys()))
+
+    for repartidor in valid_repartidores:
+        item = {
+            'repartidor': repartidores[repartidor],
+            'repartidor_id': repartidor,
+            'tipos': {
+                'producto': base_utils.value_or_default('producto', group_tipo[repartidor], 0),
+                'terceros': base_utils.value_or_default('terceros', group_tipo[repartidor], 0),
+                'interna': base_utils.value_or_default('interna', group_tipo[repartidor], 0)
+            },
+            'statuses': {
+                'creada': base_utils.value_or_default('creada', status_counts[repartidor], 0),
+                'agendada': base_utils.value_or_default('agendada', status_counts[repartidor], 0),
+                'asignada': base_utils.value_or_default('asignada', status_counts[repartidor], 0),
+                'ruta': base_utils.value_or_default('ruta', status_counts[repartidor], 0),
+                'cancelada': base_utils.value_or_default('cancelada', status_counts[repartidor], 0),
+                'efectiva': base_utils.value_or_default('efectiva', status_counts[repartidor], 0),
+                'transferencia': base_utils.value_or_default('transferencia', status_counts[repartidor], 0),
+                'reagendada': base_utils.value_or_default('reagendada', status_counts[repartidor], 0)
+            },
+            'total': base_utils.value_or_default('producto', group_tipo[repartidor], 0) +
+                     base_utils.value_or_default('terceros', group_tipo[repartidor], 0) +
+                     base_utils.value_or_default('interna', group_tipo[repartidor], 0)
+        }
+        resp.append(item)
+
+    return resp
 
 
 def create_obj_operacion(data, model):

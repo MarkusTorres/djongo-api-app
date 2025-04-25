@@ -17,8 +17,8 @@ def repartidor_info(id):
         return None
 
 
-def get_repartidores():
-    queryset = Empleado.objects.filter(id_tipo=1)
+def get_repartidores(repartidor_id=None):
+    queryset = Empleado.objects.filter(id_tipo=1) if repartidor_id is None else Empleado.objects.filter(id=repartidor_id)
     return {empleado.id: empleado.nombre for empleado in queryset}
 
 
