@@ -212,8 +212,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         try:
             data = request.data
 
-            if data['codigo'] is not None:
-                resp = Operacion.objects.filter(codigo=data['codigo'])
+            if data['codigos'] is not None:
+                resp = Operacion.objects.filter(codigo__in=data['codigos'])
                 return resp
 
             fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if data['fecha1'] else None
