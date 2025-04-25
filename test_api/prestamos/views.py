@@ -55,17 +55,15 @@ class PrestamosViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def create_abono_str(abono_cantidad):
-        return f'{{"cantidad":{str(abono_cantidad)},"fecha":"{str(datetime.datetime.now())}"}}'
+        json_str = f'{{"cantidad":{str(abono_cantidad)},"fecha":"{str(datetime.datetime.now())}"}}'
+        return json.loads(json_str)
 
     @staticmethod
     def add_json_entry(json_list, json_object):
-        json_list = json_list if json_list else '[]'
-        entries = json.loads(json_list)
-        new_entry = json.loads(json_object)
-        entries.append(new_entry)
-        # new_history = json.dumps(entries)
+        json_list = json_list if json_list else []
+        json_list.append(json_object)
 
-        return entries
+        return json_list
 
     def update(self, request, *args, **kwargs):
         data = request.data
