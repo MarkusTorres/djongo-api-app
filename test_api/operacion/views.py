@@ -51,8 +51,6 @@ class OperacionesPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
 
 
-# TODO: when adding operaciones, check if the codigo is already there
-
 def add_queries(all_data, status_filtro: str, filtro_fecha, filtro_operacion, filtro_repartidor):
     queryset = all_data
     try:
@@ -207,7 +205,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
     @base_utils.paginate
     @action(detail=False, methods=['post'])
-    @auth_check()
+    # @auth_check()
     def filtro(self, request, pk=None):
         try:
             data = request.data
@@ -228,9 +226,12 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                 Operacion.objects.filter(repartidor=data['repartidor']) if data['repartidor'] else None,
                 Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
             ]
+            if finalizada is None:
+                queries_list.pop(1)
             queryset = Operacion.objects.all()
         except ObjectDoesNotExist:
-            return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
+            return []
+            # return Response(data=f'Could not compelte query, please try again', status=status.HTTP_400_BAD_REQUEST)
         # breakpoint()
         for query in queries_list:
             if query is not None and len(query) == 0:  # distinction for empty query object (nothing found)
