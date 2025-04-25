@@ -429,6 +429,7 @@ def create_obj_operacion(data, model):
         municipio_nombre=data['municipio_nombre'] if value_or_default(data, 'municipio_nombre') else '',
         finalizada=data['finalizada'] if value_or_default(data, 'finalizada') else False,
         pagado=data['pagado'] if value_or_default(data, 'pagado') else False,
+        id_proveedor=data['id_proveedor'] if value_or_default(data, 'id_proveedor') else 0,
     )
 
     return new_item
@@ -495,6 +496,7 @@ def bulk_update(data, model):
     operacion_obj.municipio_nombre = value_or_default('municipio_nombre', data, operacion_obj.municipio_nombre)
     operacion_obj.finalizada = value_or_default('finalizada', data, operacion_obj.finalizada)
     operacion_obj.pagado = value_or_default('pagado', data, operacion_obj.pagado)
+    operacion_obj.id_proveedor = value_or_default('id_proveedor', data, operacion_obj.id_proveedor)
     operacion_obj.save()
 
     serializer_class = OperacionSerializer(operacion_obj)

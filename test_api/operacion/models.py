@@ -59,6 +59,7 @@ class Operacion(models.Model):
     finalizada = models.BooleanField(blank=True, default=False)
     # pagado will work as a flag on the reports
     pagado = models.BooleanField(blank=True, default=False)
+    id_proveedor = models.PositiveIntegerField(blank=False, default=0)
 
     class Meta:
         ordering = ["status"]
