@@ -38,7 +38,8 @@ class EmpleadoViewSet(base_utils.GenericViewSetAuth):
             usuario_nombre=data['usuario_nombre'],
             usuario_password=data['usuario_password'],
             fecha_inicio=data['fecha_inicio'],
-            fecha_final=data['fecha_final']
+            fecha_final=data['fecha_final'],
+            ganancia=data['ganancia']
         )
         serializer = EmpleadoSerializer(new_item)
         return Response(serializer.data)
@@ -57,6 +58,7 @@ class EmpleadoViewSet(base_utils.GenericViewSetAuth):
         empleado_obj.usuario_password = base_utils.value_or_default('usuario_password', data, empleado_obj.usuario_password)
         empleado_obj.fecha_inicio = base_utils.value_or_default('fecha_inicio', data, empleado_obj.fecha_inicio)
         empleado_obj.fecha_final = base_utils.value_or_default('fecha_final', data, empleado_obj.fecha_final)
+        empleado_obj.ganancia = base_utils.value_or_default('ganancia', data, empleado_obj.ganancia)
 
         empleado_obj.save()
         serialized_obj = EmpleadoSerializer(empleado_obj)

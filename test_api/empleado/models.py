@@ -9,6 +9,7 @@ class Empleado(models.Model):
     nombre = models.CharField(max_length=50, default='', blank=False)
     posicion = models.CharField(max_length=50, default='', blank=True)
     sueldo = models.FloatField(blank=False, default=1)
+    ganancia = models.FloatField(blank=False, default=1)
     usuario_nombre = models.CharField(max_length=50, default='', blank=False)
     usuario_password = models.CharField(max_length=50, default='', blank=False)
     fecha_inicio = models.DateField()

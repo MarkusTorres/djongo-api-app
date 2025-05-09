@@ -279,6 +279,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             {
                 'total': {
                     'precio': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('precio'))['sum_precio'],
+                    'tarifa': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('tarifa'))['sum_tarifa'],
                     'count_precio': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).count()
                 }
             },
