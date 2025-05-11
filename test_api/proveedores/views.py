@@ -52,8 +52,8 @@ class ProveedorViewSet(base_utils.GenericViewSetAuth):
         proveedor_obj = Proveedor.objects.filter(id__exact=data['id']).get()
         proveedor_obj.nombre = base_utils.value_or_default('nombre', data, proveedor_obj.nombre)
         proveedor_obj.tarifa = base_utils.value_or_default('tarifa', data, proveedor_obj.tarifa)
-        proveedor_obj.tarifa_contacto_efectivo = base_utils.value_or_default('tarifa_contacto_efectivo', data, proveedor_obj.tarifa_foraneo)
-        proveedor_obj.tarifa_repartidor = base_utils.value_or_default('tarifa_repartidor', data, proveedor_obj.tarifa_local)
+        proveedor_obj.tarifa_contacto_efectivo = base_utils.value_or_default('tarifa_contacto_efectivo', data, proveedor_obj.tarifa_contacto_efectivo)
+        proveedor_obj.tarifa_repartidor = base_utils.value_or_default('tarifa_repartidor', data, proveedor_obj.tarifa_repartidor)
 
         proveedor_obj.save()
         serialized_obj = ProveedorSerializer(proveedor_obj)
