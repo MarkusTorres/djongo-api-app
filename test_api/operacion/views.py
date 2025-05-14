@@ -252,14 +252,17 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     @auth_check()
     def totales_repartidor(self, request, pk=None):
         data = request.data
-        resp = group_operaciones_report(data['repartidor'])
+        finalizada = base_utils.value_or_default('finalizada', data, False)
+        resp = group_operaciones_report(data['repartidor'], finalizada=finalizada)
 
         return Response(resp)
 
     @action(detail=False, methods=['get'])
     @auth_check()
     def repartidores_global(self, request, pk=None):
-        resp = group_operaciones_report()
+        data = request.data
+        finalizada = base_utils.value_or_default('finalizada', data, False)
+        resp = group_operaciones_report(repartidor_id=None, finalizada=finalizada)
 
         return Response(resp)
 
@@ -316,16 +319,16 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         return Response(results, status=status.HTTP_201_CREATED)
 
 
-def group_operaciones_report(repartidor_id=None):
+def group_operaciones_report(repartidor_id=None, finalizada=False):
     resp = []
     repartidores = get_repartidores() if repartidor_id is None else get_repartidores(repartidor_id)
     group_status = Operacion.objects \
-        .filter(finalizada__in=[False]) \
+        .filter(finalizada__in=[finalizada]) \
         .values('repartidor', 'status') \
         .annotate(db_count=Count('status')) \
         .order_by()
     group_tipo = Operacion.objects\
-        .filter(finalizada__in=[False])\
+        .filter(finalizada__in=[finalizada])\
         .values('repartidor', 'id_tipo_operacion')\
         .annotate(db_count=Count('status'))\
         .order_by()
@@ -355,7 +358,8 @@ def group_operaciones_report(repartidor_id=None):
             },
             'total': base_utils.value_or_default('producto', group_tipo[repartidor], 0) +
                      base_utils.value_or_default('terceros', group_tipo[repartidor], 0) +
-                     base_utils.value_or_default('interna', group_tipo[repartidor], 0)
+                     base_utils.value_or_default('interna', group_tipo[repartidor], 0),
+            'finalizada': finalizada
         }
         resp.append(item)
 
