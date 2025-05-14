@@ -271,15 +271,14 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d')
         queryset = Operacion.objects.all()
         filtro_repartidor = Operacion.objects.filter(repartidor=data['repartidor']) if data['repartidor'] else queryset
-        filtro_fecha = Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
-        filtro_operacion = Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else None
+        filtro_fecha = Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else queryset
+        filtro_operacion = Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else queryset
 
-        # terceros tiene que sumar por proveedor, total ($$$) y count #
         resp = [
             {
                 'total': {
                     'precio': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('precio'))['sum_precio'],
-                    'tarifa': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('tarifa'))['sum_tarifa'],
+                    'tarifa': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_tarifa=Sum('tarifa'))['sum_tarifa'],
                     'count_precio': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).count()
                 }
             },
