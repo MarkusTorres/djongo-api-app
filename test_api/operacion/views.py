@@ -256,7 +256,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     def totales_repartidor(self, request, pk=None):
         data = request.data
         finalizada = base_utils.value_or_default('finalizada', data, False)
-        resp = group_operaciones_report(data['repartidor'], finalizada=finalizada)
+        pagado = base_utils.value_or_default('pagado', data, False)
+        resp = group_operaciones_report(data['repartidor'], finalizada=finalizada, pagado=pagado)
 
         return Response(resp)
 
@@ -265,7 +266,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     def repartidores_global(self, request, pk=None):
         data = request.data
         finalizada = base_utils.value_or_default('finalizada', data, False)
-        resp = group_operaciones_report(repartidor_id=None, finalizada=finalizada)
+        pagado = base_utils.value_or_default('pagado', data, False)
+        resp = group_operaciones_report(repartidor_id=None, finalizada=finalizada, pagado=pagado)
 
         return Response(resp)
 
@@ -322,16 +324,18 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         return Response(results, status=status.HTTP_201_CREATED)
 
 
-def group_operaciones_report(repartidor_id=None, finalizada=False):
+def group_operaciones_report(repartidor_id=None, finalizada=False, pagado=False):
     resp = []
     repartidores = get_repartidores() if repartidor_id is None else get_repartidores(repartidor_id)
     group_status = Operacion.objects \
         .filter(finalizada__in=[finalizada]) \
+        .filter(pagado__in=[pagado]) \
         .values('repartidor', 'status') \
         .annotate(db_count=Count('status')) \
         .order_by()
-    group_tipo = Operacion.objects\
-        .filter(finalizada__in=[finalizada])\
+    group_tipo = Operacion.objects \
+        .filter(finalizada__in=[finalizada]) \
+        .filter(pagado__in=[pagado]) \
         .values('repartidor', 'id_tipo_operacion')\
         .annotate(db_count=Count('status'))\
         .order_by()
@@ -362,7 +366,8 @@ def group_operaciones_report(repartidor_id=None, finalizada=False):
             'total': base_utils.value_or_default('producto', group_tipo[repartidor], 0) +
                      base_utils.value_or_default('terceros', group_tipo[repartidor], 0) +
                      base_utils.value_or_default('interna', group_tipo[repartidor], 0),
-            'finalizada': finalizada
+            'finalizada': finalizada,
+            'pagado': pagado,
         }
         resp.append(item)
 
