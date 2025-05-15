@@ -193,7 +193,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             pagado = base_utils.value_or_default('pagado', data, False)
             q_pagado = Q(pagado__in=[pagado])
 
-            if q_fecha:
+            if fecha_1 and fecha_2:
                 queryset = Operacion.objects.filter(q_repartidor & q_finalizada & q_pagado & q_fecha)
             else:
                 queryset = Operacion.objects.filter(q_repartidor & q_finalizada & q_pagado)
