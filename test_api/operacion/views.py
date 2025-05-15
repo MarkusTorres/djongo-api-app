@@ -193,7 +193,10 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             pagado = base_utils.value_or_default('pagado', data, False)
             q_pagado = Q(pagado__in=[pagado])
 
-            queryset = Operacion.objects.filter(q_repartidor & q_finalizada & q_pagado & q_fecha)
+            if q_fecha:
+                queryset = Operacion.objects.filter(q_repartidor & q_finalizada & q_pagado & q_fecha)
+            else:
+                queryset = Operacion.objects.filter(q_repartidor & q_finalizada & q_pagado)
 
             serializer_context = {
                 'request': request,
