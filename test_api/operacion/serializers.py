@@ -11,8 +11,13 @@ class OperacionSerializer(serializers.HyperlinkedModelSerializer):
                   'cantidad', 'comentario', 'precio', 'nombre_referencia',
                   'numero_referencia', 'repartidor', 'historial', 'peso',
                   'largo', 'ancho', 'alto', 'devoluciones', 'entregas', 'inventario_relacion', 'imagen', 
-                  'imagen_opcional', 'monicipio_id', 'municipio_nombre', 'finalizada', 'pagado', 'id_proveedor']
+                  'imagen_opcional', 'monicipio_id', 'municipio_nombre', 'finalizada', 'pagado', 'id_proveedor',
+                  'id_cliente']
 
 
 class FlujoSerializer(serializers.HyperlinkedModelSerializer):
+    pass
+
+
+class Flujo2Serializer(serializers.HyperlinkedModelSerializer):
     pass

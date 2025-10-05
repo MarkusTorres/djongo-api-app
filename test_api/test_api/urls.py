@@ -26,12 +26,15 @@ from proveedores import views as views_proveedores
 from inventario import views as views_inventario
 from municipio import views as views_municipios
 from prestamos import views as views_prestamos
+from gasto_fijo import views as views_gasto_fijo
+from corte import views as views_corte
 from tokens import views as views_tokens
 
 router = DefaultRouter()
 router.register(r'operacion', views_operacion.OperacionViewSet, basename='operacion')
 router.register(r'operacion-bulk', views_operacion.OperacionBulkViewSet, basename='operacion-bulk')
 router.register(r'flujo_operacion', views_operacion.FlujoViewSet, basename='flujo')
+router.register(r'flujo_operacion_2', views_operacion.Flujo2ViewSet, basename='flujo_2')
 router.register(r'empleados', views_empleado.EmpleadoViewSet, basename='empleado')
 router.register(r'clientes', views_clientes.ClienteViewSet, basename='cliente')
 # router.register(r'repartidores', views_repartidores.RepartidorViewSet, basename='repartidor')
@@ -39,6 +42,8 @@ router.register(r'proveedores', views_proveedores.ProveedorViewSet, basename='pr
 router.register(r'inventario', views_inventario.InventarioViewSet, basename='inventario')
 router.register(r'prestamos', views_prestamos.PrestamosViewSet, basename='prestamos')
 router.register(r'municipios', views_municipios.MunicipioViewSet, basename='municipio')
+router.register(r'gasto_fijo', views_gasto_fijo.GastoFijoViewSet, basename='gasto_fijo')
+router.register(r'corte', views_corte.CorteViewSet, basename='corte')
 router.register(r'auth', views_tokens.AuthViewSet, basename='auth')
 
 urlpatterns = [

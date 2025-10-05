@@ -36,7 +36,8 @@ class InventarioViewSet(base_utils.GenericViewSetAuth):
             id=base_utils.get_model_new_id(Inventario),
             concepto=data['concepto'],
             cantidad=data['cantidad'],
-            comentario=data['comentario']
+            comentario=data['comentario'],
+            id_proveedor= base_utils.value_or_default('id_proveedor', data, data['id_proveedor'])
         )
         serializer = InventarioSerializer(new_item)
         return Response(serializer.data)
@@ -71,6 +72,7 @@ class InventarioViewSet(base_utils.GenericViewSetAuth):
         inventario_obj.concepto = base_utils.value_or_default('concepto', data, inventario_obj.concepto)
         inventario_obj.cantidad = base_utils.value_or_default('cantidad', data, inventario_obj.cantidad)
         inventario_obj.comentario = base_utils.value_or_default('comentario', data, inventario_obj.comentario)
+        inventario_obj.id_proveedor = base_utils.value_or_default('id_proveedor', data, inventario_obj.id_proveedor)
 
         inventario_obj.save()
         serialized_obj = InventarioSerializer(inventario_obj)

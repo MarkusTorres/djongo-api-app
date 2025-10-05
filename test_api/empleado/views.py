@@ -34,7 +34,7 @@ class EmpleadoViewSet(base_utils.GenericViewSetAuth):
             id_tipo=data['id_tipo'],
             nombre=data['nombre'],
             posicion=data['posicion'],
-            sueldo=data['sueldo'],
+            sueldo=data['sueldo'] if data['sueldo'] else 0,
             usuario_nombre=data['usuario_nombre'],
             usuario_password=data['usuario_password'],
             fecha_inicio=data['fecha_inicio'],

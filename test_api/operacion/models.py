@@ -60,10 +60,14 @@ class Operacion(models.Model):
     # pagado will work as a flag on the reports
     pagado = models.BooleanField(blank=True, default=False)
     id_proveedor = models.PositiveIntegerField(blank=False, default=0)
+    id_cliente = models.PositiveIntegerField(blank=False, default=0)
 
     class Meta:
         ordering = ["status"]
 
 
 class Flujo(models.Model):
+    pass
+
+class Flujo2(models.Model):
     pass

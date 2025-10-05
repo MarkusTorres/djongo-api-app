@@ -11,4 +11,5 @@ class Inventario(models.Model):
     # cantidad = models.IntegerField(blank=False, validators=[MinValueValidator(1), MaxValueValidator(1000)])
     cantidad = models.IntegerField(blank=False)
     comentario = models.TextField(blank=True)
+    id_proveedor = models.PositiveIntegerField(blank=False, default=0)
 

@@ -54,7 +54,9 @@ INSTALLED_APPS = [
     "inventario",
     "municipio",
     "prestamos",
-    "tokens"
+    "tokens",
+    "gasto_fijo",
+    "corte"
 ]
 
 MIDDLEWARE = [

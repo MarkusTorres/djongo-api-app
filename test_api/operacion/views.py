@@ -6,9 +6,9 @@ from django.http import Http404
 from operacion.models import Operacion
 from inventario.views import update_inventario
 from empleado.views import repartidor_info, get_repartidores
-from operacion.models import Flujo
+from operacion.models import Flujo, Flujo2
 from operacion.serializers import OperacionSerializer
-from operacion.serializers import FlujoSerializer
+from operacion.serializers import FlujoSerializer, Flujo2Serializer
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework import viewsets, status
@@ -28,11 +28,17 @@ from collections import OrderedDict
 CREADA = 'creada'
 AGENDADA = 'agendada'
 EN_RUTA = 'en ruta'
+EN_RUTA_INTENTO_1 = 'en ruta intento 1'
+RUTA_INTENTO_2 = 'ruta intento 2'
 CANCELADA = 'cancelada'
 EFECTIVA = 'efectiva'
 TRANSFERENCIA = 'transferencia'
 REAGENDADA = 'reagendada'
 ASIGNADA = 'asignada'
+ASIGNADA_INTENTO_1 = 'Asignada intento 1'
+ASIGNADA_INTENTO_2 = 'Asignada intento 2'
+INTENTO_2 = 'intento 2'
+RETORNO = 'retorno'
 
 flujo_operacion = {
     CREADA: [AGENDADA, ASIGNADA],
@@ -42,6 +48,16 @@ flujo_operacion = {
     EFECTIVA: [REAGENDADA, CANCELADA],
     TRANSFERENCIA: [REAGENDADA, CANCELADA],
     CANCELADA: [ASIGNADA]
+}
+
+flujo_operacion_2 = {
+    CREADA: [ASIGNADA_INTENTO_1, CANCELADA],
+    ASIGNADA_INTENTO_1: [EN_RUTA_INTENTO_1],
+    EN_RUTA_INTENTO_1: [INTENTO_2, EFECTIVA, CANCELADA],
+    INTENTO_2: [ASIGNADA_INTENTO_2, CANCELADA],
+    ASIGNADA_INTENTO_2: [RUTA_INTENTO_2],
+    RUTA_INTENTO_2: [EFECTIVA, CANCELADA, RETORNO],
+    RETORNO: [INTENTO_2, CANCELADA]
 }
 
 
@@ -409,6 +425,7 @@ def create_obj_operacion(data, model):
         finalizada=data['finalizada'] if value_or_default(data, 'finalizada') else False,
         pagado=data['pagado'] if value_or_default(data, 'pagado') else False,
         id_proveedor=data['id_proveedor'] if value_or_default(data, 'id_proveedor') else 0,
+        id_cliente=data['id_cliente'] if value_or_default(data, 'id_cliente') else 0,
     )
 
     return new_item
@@ -476,6 +493,7 @@ def bulk_update(data, model):
     operacion_obj.finalizada = value_or_default('finalizada', data, operacion_obj.finalizada)
     operacion_obj.pagado = value_or_default('pagado', data, operacion_obj.pagado)
     operacion_obj.id_proveedor = value_or_default('id_proveedor', data, operacion_obj.id_proveedor)
+    operacion_obj.id_cliente = value_or_default('id_cliente', data, operacion_obj.id_cliente)
     operacion_obj.save()
 
     serializer_class = OperacionSerializer(operacion_obj)
@@ -540,6 +558,14 @@ class FlujoViewSet(viewsets.ReadOnlyModelViewSet):
 
     def list(self, request, *args, **kwargs):
         return Response(flujo_operacion)
+
+
+class Flujo2ViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Flujo2.objects.all()
+    serializer_class = Flujo2Serializer
+
+    def list(self, request, *args, **kwargs):
+        return Response(flujo_operacion_2)
 
 
 @api_view(['GET'])
