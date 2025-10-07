@@ -5,7 +5,7 @@ from djongo import models
 class Empleado(models.Model):
     _id = models.ObjectIdField()
     id = models.PositiveIntegerField(default=0, blank=False)
-    id_tipo = models.IntegerField(choices=[(1, 'Repartidor'), (2, 'Empleado'), (3, 'Analista'), (4, 'Maistro'), (4, 'Externo')])
+    id_tipo = models.IntegerField(choices=[(1, 'Repartidor'), (2, 'Empleado'), (3, 'Analista'), (4, 'Maistro'), (5, 'Externo')])
     nombre = models.CharField(max_length=50, default='', blank=False)
     posicion = models.CharField(max_length=50, default='', blank=True)
     sueldo = models.FloatField(blank=False, default=1)
