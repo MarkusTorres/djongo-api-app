@@ -310,12 +310,18 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
                 'status': {
                     'creada': add_queries(queryset, 'creada', filtro_fecha, filtro_operacion, filtro_repartidor),
                     'agendada': add_queries(queryset, 'agendada', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'asignada': add_queries(queryset, 'asignada', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'ruta': add_queries(queryset, 'en ruta', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'en ruta': add_queries(queryset, 'en ruta', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'en ruta intento 1': add_queries(queryset, 'intento 1', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'ruta intento 2': add_queries(queryset, 'intento 2', filtro_fecha, filtro_operacion, filtro_repartidor),
                     'cancelada': add_queries(queryset, 'cancelada', filtro_fecha, filtro_operacion, filtro_repartidor),
                     'efectiva': add_queries(queryset, 'efectiva', filtro_fecha, filtro_operacion, filtro_repartidor),
                     'transferencia': add_queries(queryset, 'transferencia', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion, filtro_repartidor)
+                    'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'asignada': add_queries(queryset, 'asignada', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'Asignada intento 1': add_queries(queryset, 'Asignada intento 1', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'Asignada intento 2': add_queries(queryset, 'Asignada intento 2', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'intento 2': add_queries(queryset, 'intento 2', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'retorno': add_queries(queryset, 'retorno', filtro_fecha, filtro_operacion, filtro_repartidor),
                 }
             }
         ]

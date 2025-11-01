@@ -1,11 +1,12 @@
 from clientes.models import Cliente
 from clientes.serializers import ClienteSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.reverse import reverse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from tokens.views import auth_check
 from utils import base_utils
+from django.db.models import Q
 
 
 class ClienteViewSet(base_utils.GenericViewSetAuth):
@@ -83,6 +84,25 @@ class ClienteViewSet(base_utils.GenericViewSetAuth):
         serialized_obj = ClienteSerializer(cliente_obj)
 
         return Response(serialized_obj.data, status=status.HTTP_200_OK)
+
+
+    @action(detail=False, methods=['post'])
+    @auth_check()
+    def filtro(self, request, pk=None):
+        try:
+            data = request.data
+            q_cliente = Q(id__exact=data['cliente_id'])
+            queryset = Cliente.objects.filter(q_cliente)
+
+            serializer_context = {
+                'request': request,
+            }
+            serializer = ClienteSerializer(queryset, context=serializer_context, many=True)
+            return Response(serializer.data)
+        except Cliente.DoesNotExist:
+            return Response(data="No se encontraron resultados")
+        except Exception:
+            return Response(data="Datos erroneos")
 
 
 @api_view

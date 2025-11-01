@@ -4,17 +4,21 @@ from phonenumber_field.modelfields import PhoneNumberField
 import datetime
 
 ESTADOS = [
-    ('creada', 'Creada'),
-    ('agendada', 'Agendada'),
+    ('creada', 'creada'),
+    ('agendada', 'agendada'),
     ('en ruta', 'Ruta'),
+    ('en ruta intento 1', 'Ruta intento 1'),
+    ('ruta intento 2', 'Ruta intento 2'),
+    ('cancelada', 'Cancelada'),
     ('efectiva', 'Efectiva'),
     ('transferencia', 'Transferencia'),
     ('reagendada', 'Reagendada'),
-    ('cancelada', 'Cancelada'),
-    ('entregada', 'Entregada'),
-    ('finalizada', 'Finalizada'),
+    ('asignada', 'Asignada'),
+    ('Asignada intento 1', 'Asignada intento 1'),
+    ('Asignada intento 2', 'Asignada intento 2'),
+    ('intento 2', 'Intento 2'),
+    ('retorno', 'Retorno'),
 ]
-
 
 class Operacion(models.Model):
     _id = models.ObjectIdField()
