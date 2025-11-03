@@ -1,11 +1,12 @@
 from inventario.models import Inventario
 from inventario.serializers import InventarioSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.reverse import reverse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from tokens.views import auth_check
 from utils import base_utils
+from django.db.models import Q
 import json
 
 
@@ -78,6 +79,24 @@ class InventarioViewSet(base_utils.GenericViewSetAuth):
         serialized_obj = InventarioSerializer(inventario_obj)
 
         return Response(serialized_obj.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    @auth_check()
+    def filtro(self, request, pk=None):
+        try:
+            data = request.data
+            q_proveedor = Q(id_proveedor__exact=data['id_proveedor'])
+            queryset =Inventario.objects.filter(q_proveedor)
+
+            serializer_context = {
+                'request': request,
+            }
+            serializer = InventarioSerializer(queryset, context=serializer_context, many=True)
+            return Response(serializer.data)
+        except Inventario.DoesNotExist:
+            return Response(data="No se encontraron resultados")
+        except Exception:
+            return Response(data="Datos erroneos")
 
 
 @api_view

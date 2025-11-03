@@ -222,6 +222,34 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         except Operacion.DoesNotExist:
             return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=False, methods=['post'])
+    @auth_check()
+    def cliente(self, request, pk=None):
+        data = request.data
+        try:
+            q_cliente = Q(repartidor__exact=data['cliente'])
+            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if base_utils.value_or_default('fecha1',
+                                                                                                            data,
+                                                                                                            False) else None
+            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d') if base_utils.value_or_default('fecha2',
+                                                                                                            data,
+                                                                                                            False) else None
+            q_fecha = Q(fecha_inicio__range=(fecha_1, fecha_2))
+
+            if fecha_1 and fecha_2:
+                queryset = Operacion.objects.filter(q_cliente & q_fecha)
+            else:
+                queryset = Operacion.objects.filter(q_cliente)
+
+            serializer_context = {
+                'request': request,
+            }
+            serializer = OperacionSerializer(queryset, context=serializer_context, many=True)
+            return Response(serializer.data)
+        except Operacion.DoesNotExist:
+            return Response(data="No se encontraron resultados", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
     @base_utils.paginate
     @action(detail=False, methods=['post'])
     # @auth_check()
@@ -378,12 +406,18 @@ def group_operaciones_report(repartidor_id=None, finalizada=False, pagado=False)
             'statuses': {
                 'creada': base_utils.value_or_default('creada', status_counts[repartidor], 0),
                 'agendada': base_utils.value_or_default('agendada', status_counts[repartidor], 0),
-                'asignada': base_utils.value_or_default('asignada', status_counts[repartidor], 0),
-                'ruta': base_utils.value_or_default('ruta', status_counts[repartidor], 0),
+                'en ruta': base_utils.value_or_default('en ruta', status_counts[repartidor], 0),
+                'en ruta intento 1': base_utils.value_or_default('en ruta intento 1', status_counts[repartidor], 0),
+                'ruta intento 2': base_utils.value_or_default('ruta intento 2', status_counts[repartidor], 0),
                 'cancelada': base_utils.value_or_default('cancelada', status_counts[repartidor], 0),
                 'efectiva': base_utils.value_or_default('efectiva', status_counts[repartidor], 0),
                 'transferencia': base_utils.value_or_default('transferencia', status_counts[repartidor], 0),
-                'reagendada': base_utils.value_or_default('reagendada', status_counts[repartidor], 0)
+                'reagendada': base_utils.value_or_default('reagendada', status_counts[repartidor], 0),
+                'asignada': base_utils.value_or_default('asignada', status_counts[repartidor], 0),
+                'Asignada intento 1': base_utils.value_or_default('Asignada intento 1', status_counts[repartidor], 0),
+                'Asignada intento 2': base_utils.value_or_default('Asignada intento 2', status_counts[repartidor], 0),
+                'intento 2': base_utils.value_or_default('intento 2', status_counts[repartidor], 0),
+                'retorno': base_utils.value_or_default('retorno', status_counts[repartidor], 0)
             },
             'total': base_utils.value_or_default('producto', group_tipo[repartidor], 0) +
                      base_utils.value_or_default('terceros', group_tipo[repartidor], 0) +
