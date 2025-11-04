@@ -227,7 +227,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
     def cliente(self, request, pk=None):
         data = request.data
         try:
-            q_cliente = Q(repartidor__exact=data['cliente'])
+            q_cliente = Q(id_cliente__exact=data['id_cliente'])
             fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if base_utils.value_or_default('fecha1',
                                                                                                             data,
                                                                                                             False) else None
