@@ -322,9 +322,10 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d')
         fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d')
         queryset = Operacion.objects.all()
-        filtro_repartidor = Operacion.objects.filter(repartidor=data['repartidor']) if data['repartidor'] else queryset
+        filtro_repartidor = Operacion.objects.filter(repartidor=data['repartidor']) if ('repartidor' in data.keys()) else queryset
         filtro_fecha = Operacion.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else queryset
-        filtro_operacion = Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if data['id_tipo_operacion'] else queryset
+        filtro_operacion = Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if ('id_tipo_operacion' in data.keys()) else queryset
+        filtro_cliente = Operacion.objects.filter(id_cliente=data['id_cliente']) if ('id_cliente' in data.keys()) else queryset
 
         resp = [
             {
