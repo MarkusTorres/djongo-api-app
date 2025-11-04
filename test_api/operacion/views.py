@@ -67,11 +67,12 @@ class OperacionesPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
 
 
-def add_queries(all_data, status_filtro: str, filtro_fecha, filtro_operacion, filtro_repartidor):
+def add_queries(all_data, status_filtro: str, filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente):
     queryset = all_data
     try:
         queries_list = [
             Operacion.objects.filter(status=status_filtro),
+            filtro_cliente,
             filtro_repartidor,
             filtro_operacion,
             filtro_fecha
@@ -330,27 +331,27 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         resp = [
             {
                 'total': {
-                    'precio': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('precio'))['sum_precio'],
-                    'tarifa': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_tarifa=Sum('tarifa'))['sum_tarifa'],
-                    'count_precio': (queryset & filtro_repartidor & filtro_operacion & filtro_fecha).count()
+                    'precio': (queryset & filtro_cliente & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_precio=Sum('precio'))['sum_precio'],
+                    'tarifa': (queryset & filtro_cliente & filtro_repartidor & filtro_operacion & filtro_fecha).aggregate(sum_tarifa=Sum('tarifa'))['sum_tarifa'],
+                    'count_precio': (queryset & filtro_cliente & filtro_repartidor & filtro_operacion & filtro_fecha).count()
                 }
             },
             {
                 'status': {
-                    'creada': add_queries(queryset, 'creada', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'agendada': add_queries(queryset, 'agendada', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'en ruta': add_queries(queryset, 'en ruta', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'en ruta intento 1': add_queries(queryset, 'intento 1', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'ruta intento 2': add_queries(queryset, 'intento 2', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'cancelada': add_queries(queryset, 'cancelada', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'efectiva': add_queries(queryset, 'efectiva', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'transferencia': add_queries(queryset, 'transferencia', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'asignada': add_queries(queryset, 'asignada', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'Asignada intento 1': add_queries(queryset, 'Asignada intento 1', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'Asignada intento 2': add_queries(queryset, 'Asignada intento 2', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'intento 2': add_queries(queryset, 'intento 2', filtro_fecha, filtro_operacion, filtro_repartidor),
-                    'retorno': add_queries(queryset, 'retorno', filtro_fecha, filtro_operacion, filtro_repartidor),
+                    'creada': add_queries(queryset, 'creada', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'agendada': add_queries(queryset, 'agendada', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'en ruta': add_queries(queryset, 'en ruta', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'en ruta intento 1': add_queries(queryset, 'intento 1', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'ruta intento 2': add_queries(queryset, 'intento 2', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'cancelada': add_queries(queryset, 'cancelada', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'efectiva': add_queries(queryset, 'efectiva', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'transferencia': add_queries(queryset, 'transferencia', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'reagendada': add_queries(queryset, 'reagendada', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'asignada': add_queries(queryset, 'asignada', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'Asignada intento 1': add_queries(queryset, 'Asignada intento 1', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'Asignada intento 2': add_queries(queryset, 'Asignada intento 2', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'intento 2': add_queries(queryset, 'intento 2', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
+                    'retorno': add_queries(queryset, 'retorno', filtro_fecha, filtro_operacion, filtro_repartidor, filtro_cliente),
                 }
             }
         ]
