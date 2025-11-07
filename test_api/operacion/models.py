@@ -33,7 +33,7 @@ class Operacion(models.Model):
     direccion_final = models.TextField(blank=True)
     # tarifa = models.DecimalField(max_length=6, decimal_places=2, max_digits=6, default=1)
     tarifa = models.FloatField(blank=False)
-    fecha_inicio = models.DateField(auto_now_add=True)
+    fecha_inicio = models.DateField(auto_now_add=False)
     fecha_final = models.DateField(default=datetime.date.today)
     cantidad = models.PositiveIntegerField(blank=False, default=1)
     comentario = models.TextField(blank=True)
