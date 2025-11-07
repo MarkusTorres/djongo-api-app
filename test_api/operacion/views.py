@@ -445,7 +445,7 @@ def create_obj_operacion(data, model):
         direccion_final=data['direccion_final'],
         codigo_postal=data['codigo_postal'],
         tarifa=data['tarifa'],
-        # fecha_inicio=data['fecha_inicio'],
+        fecha_inicio=data['fecha_inicio'],
         fecha_final=data['fecha_final'],
         cantidad=data['cantidad'],
         comentario=data['comentario'],
