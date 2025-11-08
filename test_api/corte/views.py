@@ -6,6 +6,9 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from tokens.views import auth_check
 from utils import base_utils
+from rest_framework.decorators import action
+import datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class CorteViewSet(base_utils.GenericViewSetAuth):
@@ -49,6 +52,7 @@ class CorteViewSet(base_utils.GenericViewSetAuth):
         except Corte.MultipleObjectsReturned:
             return Response(data="Multiple objects found in DB")
 
+    @auth_check()
     def update(self, request, *args, **kwargs):
         data = request.data
         id_obj = kwargs['pk']
@@ -65,6 +69,27 @@ class CorteViewSet(base_utils.GenericViewSetAuth):
         serialized_obj = CorteSerializer(corte_obj)
 
         return Response(serialized_obj.data, status=status.HTTP_200_OK)
+
+    @auth_check()
+    @action(detail=False, methods=['post'])
+    def filtro_fecha(self, request, pk=None):
+        try:
+            data = request.data
+            fecha_1 = datetime.datetime.strptime(data['fecha1'], '%Y-%m-%d') if data['fecha1'] else None
+            fecha_2 = datetime.datetime.strptime(data['fecha2'], '%Y-%m-%d') if data['fecha2'] else None
+
+            query_result = Corte.objects.filter(fecha_inicio__range=(fecha_1, fecha_2)) if (fecha_1 and fecha_2) else None
+
+            serializer_context = {
+                'request': request,
+            }
+            serializer = CorteSerializer(query_result, context=serializer_context, many=True)
+
+            return Response(serializer.data)
+        except ObjectDoesNotExist:
+            return Response([])
+        except Exception:
+            return Response([])
 
 
 @api_view
