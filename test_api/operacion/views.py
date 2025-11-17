@@ -303,6 +303,8 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         data = request.data
         finalizada = base_utils.value_or_default('finalizada', data, False)
         pagado = base_utils.value_or_default('pagado', data, False)
+        fecha1 = base_utils.value_or_default('fecha1', data, None)
+        fecha2 = base_utils.value_or_default('fecha2', data, None)
         resp = group_operaciones_report(data['repartidor'], finalizada=finalizada, pagado=pagado)
 
         return Response(resp)
@@ -377,16 +379,18 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         return Response(results, status=status.HTTP_201_CREATED)
 
 
-def group_operaciones_report(repartidor_id=None, finalizada=False, pagado=False):
+def group_operaciones_report(repartidor_id=None, finalizada=False, pagado=False, fecha_1=None, fecha_2=None):
     resp = []
     repartidores = get_repartidores() if repartidor_id is None else get_repartidores(repartidor_id)
     group_status = Operacion.objects \
+        .filter(fecha_inicio__range=(fecha_1, fecha_2)) \
         .filter(finalizada__in=[finalizada]) \
         .filter(pagado__in=[pagado]) \
         .values('repartidor', 'status') \
         .annotate(db_count=Count('status')) \
         .order_by()
     group_tipo = Operacion.objects \
+        .filter(fecha_inicio__range=(fecha_1, fecha_2)) \
         .filter(finalizada__in=[finalizada]) \
         .filter(pagado__in=[pagado]) \
         .values('repartidor', 'id_tipo_operacion')\
