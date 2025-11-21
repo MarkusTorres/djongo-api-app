@@ -10,4 +10,4 @@ class Corte(models.Model):
     fecha_final = models.DateField(default=datetime.date.today)
     gastos_fijos = models.JSONField(blank=True, default=[])
     gastos_ocasionales = models.JSONField(blank=True, default=[])
-    total_ingresos = models.PositiveIntegerField(default=0, blank=False)
+    total_ingresos = models.FloatField(blank=False, default=0)
