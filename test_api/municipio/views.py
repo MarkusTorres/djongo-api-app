@@ -1,6 +1,8 @@
+from django.db.models import Q
+
 from municipio.models import Municipio
 from municipio.serializers import MunicipioSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.reverse import reverse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -12,6 +14,7 @@ class MunicipioViewSet(base_utils.GenericViewSetAuth):
     queryset = Municipio.objects.all()
     serializer_class = MunicipioSerializer
 
+    @auth_check()
     def create(self, request, *args, **kwargs):
         data = request.data
         max_id = base_utils.get_model_new_id(Municipio)
@@ -59,6 +62,25 @@ class MunicipioViewSet(base_utils.GenericViewSetAuth):
         municipio_obj.save()
         serialized_obj = MunicipioSerializer(municipio_obj)
         return Response(serialized_obj.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    @auth_check()
+    def like(self, request, pk=None):
+        try:
+            data = request.data
+            q_municipio = Q(nombre__contains=data['nombre'])
+            queryset =Municipio.objects.filter(q_municipio)
+
+            serializer_context = {
+                'request': request,
+            }
+            serializer = MunicipioSerializer(queryset, context=serializer_context, many=True)
+            return Response(serializer.data)
+        except Municipio.DoesNotExist:
+            return Response(data="No se encontraron resultados")
+        except Exception:
+            return Response(data="Datos erroneos")
+
 
 
 @api_view

@@ -65,6 +65,7 @@ class InventarioViewSet(base_utils.GenericViewSetAuth):
         except Inventario.MultipleObjectsReturned:
             return Response(data="Multiple objects found in DB")
 
+    @auth_check()
     def update(self, request, *args, **kwargs):
         data = request.data
         id_obj = kwargs['pk']
@@ -87,6 +88,25 @@ class InventarioViewSet(base_utils.GenericViewSetAuth):
             data = request.data
             q_proveedor = Q(id_proveedor__exact=data['id_proveedor'])
             queryset =Inventario.objects.filter(q_proveedor)
+
+            serializer_context = {
+                'request': request,
+            }
+            serializer = InventarioSerializer(queryset, context=serializer_context, many=True)
+            return Response(serializer.data)
+        except Inventario.DoesNotExist:
+            return Response(data="No se encontraron resultados")
+        except Exception:
+            return Response(data="Datos erroneos")
+
+
+    @action(detail=False, methods=['post'])
+    @auth_check()
+    def like(self, request, pk=None):
+        try:
+            data = request.data
+            q_inventario = Q(nombre__contains=data['nombre'])
+            queryset = Inventario.objects.filter(q_inventario)
 
             serializer_context = {
                 'request': request,
