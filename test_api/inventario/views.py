@@ -105,7 +105,7 @@ class InventarioViewSet(base_utils.GenericViewSetAuth):
     def like(self, request, pk=None):
         try:
             data = request.data
-            q_inventario = Q(nombre__contains=data['nombre'])
+            q_inventario = Q(concepto__contains=data['nombre'])
             queryset = Inventario.objects.filter(q_inventario)
 
             serializer_context = {
