@@ -270,6 +270,10 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
             queries_list = [
                 Operacion.objects.filter(id_tipo_operacion=data['id_tipo_operacion']) if ('id_tipo_operacion' in data.keys()) else None,
                 Operacion.objects.filter(finalizada__in=[finalizada]),
+                Operacion.objects.filter(municipio_nombre=data['municipio_nombre']) if ('municipio_nombre' in data.keys()) else None,
+                Operacion.objects.filter(numero_referencia=data['numero_referencia']) if ('numero_referencia' in data.keys()) else None,
+                Operacion.objects.filter(codigo_postal=data['codigo_postal']) if ('codigo_postal' in data.keys()) else None,
+                Operacion.objects.filter(comentario=data['comentario']) if ('comentario' in data.keys()) else None,
                 Operacion.objects.filter(id_cliente=data['id_cliente']) if ('id_cliente' in data.keys()) else None,
                 Operacion.objects.filter(status=data['status']) if ('status' in data.keys()) else None,
                 Operacion.objects.filter(repartidor=data['repartidor']) if ('repartidor' in data.keys()) else None,
