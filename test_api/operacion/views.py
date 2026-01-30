@@ -41,12 +41,10 @@ INTENTO_2 = 'intento 2'
 RETORNO = 'retorno'
 
 flujo_operacion = {
-    CREADA: [AGENDADA, ASIGNADA],
-    AGENDADA: [EN_RUTA, CANCELADA],
+    CREADA: [ASIGNADA],
     ASIGNADA: [EN_RUTA, CANCELADA],
-    EN_RUTA: [EFECTIVA, TRANSFERENCIA, REAGENDADA, CANCELADA],
+    EN_RUTA: [EFECTIVA, REAGENDADA, CANCELADA],
     EFECTIVA: [REAGENDADA, CANCELADA],
-    TRANSFERENCIA: [REAGENDADA, CANCELADA],
     CANCELADA: [ASIGNADA]
 }
 
@@ -309,7 +307,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
         pagado = base_utils.value_or_default('pagado', data, False)
         fecha1 = base_utils.value_or_default('fecha1', data, None)
         fecha2 = base_utils.value_or_default('fecha2', data, None)
-        resp = group_operaciones_report(data['repartidor'], finalizada=finalizada, pagado=pagado)
+        resp = group_operaciones_report(data['repartidor'], finalizada=finalizada, pagado=pagado, fecha_1=fecha1, fecha_2=fecha2)
 
         return Response(resp)
 
@@ -387,14 +385,14 @@ def group_operaciones_report(repartidor_id=None, finalizada=False, pagado=False,
     resp = []
     repartidores = get_repartidores() if repartidor_id is None else get_repartidores(repartidor_id)
     group_status = Operacion.objects \
-        .filter(fecha_inicio__range=(fecha_1, fecha_2)) \
+        .filter(fecha_final__range=(fecha_1, fecha_2)) \
         .filter(finalizada__in=[finalizada]) \
         .filter(pagado__in=[pagado]) \
         .values('repartidor', 'status') \
         .annotate(db_count=Count('status')) \
         .order_by()
     group_tipo = Operacion.objects \
-        .filter(fecha_inicio__range=(fecha_1, fecha_2)) \
+        .filter(fecha_final__range=(fecha_1, fecha_2)) \
         .filter(finalizada__in=[finalizada]) \
         .filter(pagado__in=[pagado]) \
         .values('repartidor', 'id_tipo_operacion')\
