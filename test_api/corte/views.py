@@ -1,5 +1,8 @@
 from corte.models import Corte
 from corte.serializer import CorteSerializer
+from gasto_fijo.models import GastoFijo
+from operacion.models import Operacion
+from django.db.models import Sum, Q
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework import viewsets, status
@@ -90,6 +93,35 @@ class CorteViewSet(base_utils.GenericViewSetAuth):
             return Response([])
         except Exception:
             return Response([])
+
+    @auth_check()
+    @action(detail=False, methods=['get'])
+    def auto_corte(self, request):
+        current_date = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
+        existing = Corte.objects.filter(fecha_inicio=current_date).first()
+        if existing:
+            return Response({'message': 'A corte already exists for the current date'}, status=status.HTTP_200_OK)
+        today = datetime.date.today()
+        # total_gastos_fijos = GastoFijo.objects.aggregate(total=Sum('cantidad'))['total'] or 0
+        total_gastos_fijos = list(GastoFijo.objects.all().values())
+        total_ingresos = Operacion.objects.filter(
+            fecha_inicio=today
+        ).filter(
+            Q(finalizada__in=[True]) | Q(status='efectiva')
+        ).aggregate(total=Sum('precio'))['total'] or 0
+        # breakpoint()
+        new_item = Corte.objects.create(
+            id=base_utils.get_model_new_id(Corte),
+            comentario='Corte generado de manera automatica',
+            fecha_inicio=current_date,
+            fecha_final=current_date,
+            gastos_fijos=total_gastos_fijos,
+            gastos_ocasionales=[],
+            total_ingresos=total_ingresos
+        )
+
+        serializer = CorteSerializer(new_item)
+        return Response(serializer.data)
 
 
 @api_view

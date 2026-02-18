@@ -251,7 +251,7 @@ class OperacionViewSet(base_utils.GenericViewSetAuth):
 
     @base_utils.paginate
     @action(detail=False, methods=['post'])
-    # @auth_check()
+    @auth_check()
     def filtro(self, request, pk=None):
         try:
             data = request.data
@@ -385,16 +385,16 @@ def group_operaciones_report(repartidor_id=None, finalizada=False, pagado=False,
     resp = []
     repartidores = get_repartidores() if repartidor_id is None else get_repartidores(repartidor_id)
     group_status = Operacion.objects \
-        .filter(fecha_final__range=(fecha_1, fecha_2)) \
         .filter(finalizada__in=[finalizada]) \
         .filter(pagado__in=[pagado]) \
+        .filter(fecha_final__range=(fecha_1, fecha_2)) \
         .values('repartidor', 'status') \
         .annotate(db_count=Count('status')) \
         .order_by()
     group_tipo = Operacion.objects \
-        .filter(fecha_final__range=(fecha_1, fecha_2)) \
         .filter(finalizada__in=[finalizada]) \
         .filter(pagado__in=[pagado]) \
+        .filter(fecha_final__range=(fecha_1, fecha_2)) \
         .values('repartidor', 'id_tipo_operacion')\
         .annotate(db_count=Count('status'))\
         .order_by()
